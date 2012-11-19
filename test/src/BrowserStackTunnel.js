@@ -23,7 +23,7 @@ describe('BrowserStackTunnel', function() {
   });
 
   it('should start the tunnel using the default jar file included in the package', function(done) {
-    this.timeout(5000);
+    this.timeout(10000);
     var browserStackTunnel = new BrowserStackTunnel(CONFIG.key, [{
       name: HOST_NAME,
       port: PORT,
