@@ -1,6 +1,6 @@
 var util = require('util'),
     EventEmitter = require('events').EventEmitter,
-    ChildKiller = require('ChildKiller');
+    ChildDaemon = require('child-daemon');
 
 function BrowserStackTunnel(key, hosts, jarFile) {
   jarFile = jarFile || __dirname + '/../bin/BrowserStackTunnel.jar';
@@ -11,7 +11,7 @@ function BrowserStackTunnel(key, hosts, jarFile) {
     }
     params += host.name + ',' + host.port + ',' + host.sslFlag;
   });
-  ChildKiller.call(
+  ChildDaemon.call(
     this,
     'java',
     ['-jar', jarFile, key, params],
@@ -26,6 +26,6 @@ function BrowserStackTunnel(key, hosts, jarFile) {
     });
   };
 }
-util.inherits(BrowserStackTunnel, ChildKiller);
+util.inherits(BrowserStackTunnel, ChildDaemon);
 
 module.exports = BrowserStackTunnel;

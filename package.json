@@ -1,5 +1,5 @@
 {
-  "name": "node-BrowserStackTunnel",
+  "name": "browserstacktunnel-wrapper",
   "description": "A Node.js wrapper for the BrowserStack java tunnel client ",
   "version": "0.0.1",
   "homepage": "https://github.com/pghalliday/node-BrowserStackTunnel.git",
@@ -29,7 +29,7 @@
     "test": "grunt"
   },
   "dependencies": {
-    "ChildKiller": "https://github.com/pghalliday/ChildKiller/archive/master.tar.gz"
+    "child-daemon": "https://github.com/pghalliday/node-ChildDaemon/archive/master.tar.gz"
   },
   "devDependencies": {
     "grunt": "0.3.17",

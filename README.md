@@ -16,13 +16,13 @@ http://www.browserstack.com/
 ## Installation
 
 ```
-npm install node-BrowserStackTunnel
+npm install browserstacktunnel-wrapper
 ```
 
 ## API
 
 ```javascript
-var BrowserStackTunnel = require('node-BrowserStackTunnel');
+var BrowserStackTunnel = require('browserstacktunnel-wrapper');
 
 var browserStackTunnel = new BrowserStackTunnel(YOUR_KEY, [{
   name: 'localhost',
