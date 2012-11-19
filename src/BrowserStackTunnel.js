@@ -17,6 +17,14 @@ function BrowserStackTunnel(key, hosts, jarFile) {
     ['-jar', jarFile, key, params],
     new RegExp('Press Ctrl-C to exit')
   );
+  
+  this.superStart = this.start;
+  this.start = function(callback) {
+    this.superStart(function(error, matched) {
+      // don't bother forwarding the matched array
+      callback(error);
+    });
+  };
 }
 util.inherits(BrowserStackTunnel, ChildKiller);
 

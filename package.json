@@ -21,7 +21,7 @@
       "url": "https://github.com/pghalliday/node-BrowserStackTunnel/blob/master/LICENSE-MIT"
     }
   ],
-  "main": "src/index.js",
+  "main": "src/BrowserStackTunnel.js",
   "engines": {
     "node": ">= 0.8.12"
   },
@@ -29,7 +29,7 @@
     "test": "grunt"
   },
   "dependencies": {
-    "ChildKiller": "git://github.com/pghalliday/ChildKiller.git"
+    "ChildKiller": "https://github.com/pghalliday/ChildKiller/archive/master.tar.gz"
   },
   "devDependencies": {
     "grunt": "0.3.17",

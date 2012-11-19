@@ -12,7 +12,6 @@ http://www.browserstack.com/
 - should error if stopped before started
 - should error if no server listening on the specified host and port
 - should error if started when already running
-- should stop the tunnel when the process exits
 
 ## Installation
 
@@ -40,8 +39,7 @@ browserStackTunnel.start(function(error) {
     browserStackTunnel.stop(function(error) {
       if (error) {
         console.log(error);
-      } else 
-      {
+      } else {
         // tunnel has stopped
       }
     });
@@ -68,6 +66,10 @@ module.exports = {
   key: YOUR_KEY
 };
 ```
+
+There is a template located at...
+
+``test/Support/BrowserStackConfig.example.js``
 
 ## License
 Copyright (c) 2012 Peter Halliday  
