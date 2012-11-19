@@ -36,5 +36,10 @@
     "expect.js": "0.2.0",
     "grunt-mocha-test": "0.0.1"
   },
-  "keywords": []
+  "keywords": [
+    "BrowserStack",
+    "BrowserStackTunnel",
+    "spawn",
+    "child_process"
+  ]
 }
