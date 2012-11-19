@@ -50,7 +50,7 @@ describe('BrowserStackTunnel', function() {
       sslFlag: SSL_FLAG
     }], INVALID_JAR_FILE);
     browserStackTunnel.start(function(error) {
-      expect(error.message).to.contain('tunnel failed to start');
+      expect(error.message).to.contain('child failed to start');
       done();
     });
   });
@@ -62,19 +62,20 @@ describe('BrowserStackTunnel', function() {
       sslFlag: SSL_FLAG
     }]);
     browserStackTunnel.stop(function(error) {
-      expect(error.message).to.be('tunnel not active');
+      expect(error.message).to.be('child not started');
       done();
     });    
   });
 
   it('should error if no server listening on the specified host and port', function(done) {
+    this.timeout(5000);
     var browserStackTunnel = new BrowserStackTunnel(CONFIG.key, [{
       name: HOST_NAME,
       port: INVALID_PORT,
       sslFlag: SSL_FLAG
     }]);
     browserStackTunnel.start(function(error) {
-      expect(error.message).to.contain('tunnel failed to start');
+      expect(error.message).to.contain('child failed to start');
       expect(error.message).to.contain('No one listening on ' + HOST_NAME + ':' + INVALID_PORT);
       done();
     });
@@ -92,7 +93,7 @@ describe('BrowserStackTunnel', function() {
         expect().fail('Error encountered starting the tunnel:\n' + error);
       }
       browserStackTunnel.start(function(error) {
-        expect(error.message).to.be('tunnel already started');
+        expect(error.message).to.be('child already started');
         browserStackTunnel.stop(function(error) {
           if (error) {
             expect().fail('Error encountered stopping the tunnel:\n' + error);
@@ -100,40 +101,6 @@ describe('BrowserStackTunnel', function() {
           done();
         });
       });
-    });
-  });
-
-  it('should stop the tunnel when the process exits', function(done) {
-    this.timeout(10000);
-    var child = fork('./test/Support/childProcess.js', [CONFIG.key, HOST_NAME, PORT, SSL_FLAG]);
-    child.on('message', function(message) {
-      if (message.error) {
-        expect().fail('Error encountered starting the tunnel:\n' + message.error);
-        child.on('exit', function(code, signal) {
-          done();
-        });
-      } else {
-        // TODO: check if tunnel is really running
-        child.on('exit', function(code, signal) {
-          // should be able to start the tunnel again
-          var browserStackTunnel = new BrowserStackTunnel(CONFIG.key, [{
-            name: HOST_NAME,
-            port: PORT,
-            sslFlag: SSL_FLAG
-          }]);
-          browserStackTunnel.start(function(error) {
-            if (error) {
-              expect().fail('Error encountered starting the tunnel:\n' + error);
-            }
-            // TODO: check if tunnel is really running
-            browserStackTunnel.stop(function(error) {
-              expect(error).to.be.an('undefined');
-              done();
-            });
-          });
-        });
-      }
-      child.kill('SIGINT');
     });
   });
   

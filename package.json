@@ -29,6 +29,7 @@
     "test": "grunt"
   },
   "dependencies": {
+    "ChildKiller": "git://github.com/pghalliday/ChildKiller.git"
   },
   "devDependencies": {
     "grunt": "0.3.17",
