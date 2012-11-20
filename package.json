@@ -29,7 +29,7 @@
     "test": "grunt"
   },
   "dependencies": {
-    "child-daemon": "https://github.com/pghalliday/node-ChildDaemon/archive/master.tar.gz"
+    "child-daemon": "0.0.1"
   },
   "devDependencies": {
     "grunt": "0.3.17",
