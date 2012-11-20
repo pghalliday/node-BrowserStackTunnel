@@ -1,5 +1,4 @@
 var util = require('util'),
-    EventEmitter = require('events').EventEmitter,
     ChildDaemon = require('child-daemon');
 
 function BrowserStackTunnel(key, hosts, jarFile) {
