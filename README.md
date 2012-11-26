@@ -24,11 +24,14 @@ npm install browserstacktunnel-wrapper
 ```javascript
 var BrowserStackTunnel = require('browserstacktunnel-wrapper');
 
-var browserStackTunnel = new BrowserStackTunnel(YOUR_KEY, [{
-  name: 'localhost',
-  port: 8080,
-  sslFlag: 0
-}]);
+var browserStackTunnel = new BrowserStackTunnel({
+  key: YOUR_KEY,
+  hosts: [{
+    name: 'localhost',
+    port: 8080,
+    sslFlag: 0
+  }]
+});
 
 browserStackTunnel.start(function(error) {
   if (error) {

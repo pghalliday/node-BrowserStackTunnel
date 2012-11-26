@@ -1,10 +1,10 @@
 var util = require('util'),
     ChildDaemon = require('child-daemon');
 
-function BrowserStackTunnel(key, hosts, jarFile) {
-  jarFile = jarFile || __dirname + '/../bin/BrowserStackTunnel.jar';
+function BrowserStackTunnel(options) {
+  options.jarFile = options.jarFile || __dirname + '/../bin/BrowserStackTunnel.jar';
   var params = '';
-  hosts.forEach(function(host) {
+  options.hosts.forEach(function(host) {
     if (params.length > 0) {
       params += ',';
     }
@@ -13,7 +13,7 @@ function BrowserStackTunnel(key, hosts, jarFile) {
   ChildDaemon.call(
     this,
     'java',
-    ['-jar', jarFile, key, params],
+    ['-jar', options.jarFile, options.key, params],
     new RegExp('Press Ctrl-C to exit')
   );
   

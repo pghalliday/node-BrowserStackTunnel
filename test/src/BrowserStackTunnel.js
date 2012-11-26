@@ -24,11 +24,14 @@ describe('BrowserStackTunnel', function() {
 
   it('should start the tunnel using the default jar file included in the package', function(done) {
     this.timeout(10000);
-    var browserStackTunnel = new BrowserStackTunnel(CONFIG.key, [{
-      name: HOST_NAME,
-      port: PORT,
-      sslFlag: SSL_FLAG
-    }]);
+    var browserStackTunnel = new BrowserStackTunnel({
+      key: CONFIG.key,
+      hosts: [{
+        name: HOST_NAME,
+        port: PORT,
+        sslFlag: SSL_FLAG
+      }]
+    });
     browserStackTunnel.start(function(error) {
       if (error) {
         expect().fail('Error encountered starting the tunnel:\n' + error);
@@ -44,11 +47,15 @@ describe('BrowserStackTunnel', function() {
   });
   
   it('should error if an invalid jar file is specified', function(done) {
-    var browserStackTunnel = new BrowserStackTunnel(CONFIG.key, [{
-      name: HOST_NAME,
-      port: PORT,
-      sslFlag: SSL_FLAG
-    }], INVALID_JAR_FILE);
+    var browserStackTunnel = new BrowserStackTunnel({
+      key: CONFIG.key, 
+      hosts: [{
+        name: HOST_NAME,
+        port: PORT,
+        sslFlag: SSL_FLAG
+      }],
+      jarFile: INVALID_JAR_FILE
+    });
     browserStackTunnel.start(function(error) {
       expect(error.message).to.contain('child failed to start');
       done();
@@ -56,11 +63,14 @@ describe('BrowserStackTunnel', function() {
   });
 
   it('should error if stopped before started', function(done) {
-    var browserStackTunnel = new BrowserStackTunnel(CONFIG.key, [{
-      name: HOST_NAME,
-      port: PORT,
-      sslFlag: SSL_FLAG
-    }]);
+    var browserStackTunnel = new BrowserStackTunnel({
+      key: CONFIG.key,
+      hosts: [{
+        name: HOST_NAME,
+        port: PORT,
+        sslFlag: SSL_FLAG
+      }]
+    });
     browserStackTunnel.stop(function(error) {
       expect(error.message).to.be('child not started');
       done();
@@ -69,11 +79,14 @@ describe('BrowserStackTunnel', function() {
 
   it('should error if no server listening on the specified host and port', function(done) {
     this.timeout(5000);
-    var browserStackTunnel = new BrowserStackTunnel(CONFIG.key, [{
-      name: HOST_NAME,
-      port: INVALID_PORT,
-      sslFlag: SSL_FLAG
-    }]);
+    var browserStackTunnel = new BrowserStackTunnel({
+      key: CONFIG.key,
+      hosts: [{
+        name: HOST_NAME,
+        port: INVALID_PORT,
+        sslFlag: SSL_FLAG
+      }]
+    });
     browserStackTunnel.start(function(error) {
       expect(error.message).to.contain('child failed to start');
       expect(error.message).to.contain('No one listening on ' + HOST_NAME + ':' + INVALID_PORT);
@@ -83,11 +96,14 @@ describe('BrowserStackTunnel', function() {
 
   it('should error if started when already running', function(done) {
     this.timeout(5000);
-    var browserStackTunnel = new BrowserStackTunnel(CONFIG.key, [{
-      name: HOST_NAME,
-      port: PORT,
-      sslFlag: SSL_FLAG
-    }]);
+    var browserStackTunnel = new BrowserStackTunnel({
+      key: CONFIG.key,
+      hosts: [{
+        name: HOST_NAME,
+        port: PORT,
+        sslFlag: SSL_FLAG
+      }]
+    });
     browserStackTunnel.start(function(error) {
       if (error) {
         expect().fail('Error encountered starting the tunnel:\n' + error);
