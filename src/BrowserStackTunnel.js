@@ -10,7 +10,7 @@ function BrowserStackTunnel(options) {
   var params = '',
     defaultJarPath = util.format('%s/bin/BrowserStackTunnel.jar', path.resolve('.'));
 
-  this.stdoutData = '',
+  this.stdoutData = '';
   this.tunnel = null;
     
   options.jarFile = options.jarFile || defaultJarPath;
@@ -42,7 +42,7 @@ function BrowserStackTunnel(options) {
       new_browserstack_lib.on('finish', function () {
         console.log('Downloading... Done');
         new_browserstack_lib.close();
-        self.startTunnel();        
+        self.startTunnel();
       });
 
       response.pipe(new_browserstack_lib);
@@ -95,12 +95,12 @@ function BrowserStackTunnel(options) {
 
   this.startTunnel = function () {
     if (!fs.existsSync(options.jarFile)) {
-        this.exit();
-        return;
+      this.exit();
+      return;
     }
 
     this.stdoutData = '';
-    this.tunnel = spawn('java', ['-jar', options.jarFile, options.key, params]);    
+    this.tunnel = spawn('java', ['-jar', options.jarFile, options.key, params]);
     this.tunnel.stdout.on('data', this.updateState.bind(this));
     this.tunnel.stderr.on('data', this.updateState.bind(this));
     this.tunnel.on('error', this.killTunnel.bind(this));
@@ -113,14 +113,14 @@ function BrowserStackTunnel(options) {
       this.emit('already_running');
     } else {
       this.startTunnel();
-    }    
+    }
   };
 
   this.stop = function (callback) {
     this.once('stop', callback);
     if (this.state !== 'started') {
       this.emit('stop', new Error('child not started'));
-    } 
+    }
 
     this.killTunnel();
   };

@@ -1,11 +1,10 @@
 var expect = require('expect.js'),
   mocks = require('mocks'),
-  path = require('path'),
   childProcessMock = require('../lib/mocks').childProcessMock,
   httpMock = require('../lib/mocks').httpMock,
   fsMock = require('../lib/mocks').fsMock,
   bs = mocks.loadFile('./src/BrowserStackTunnel.js', {
-    child_process:childProcessMock,
+    child_process: childProcessMock,
     http: httpMock,
     fs: fsMock.create({
       bin: {
@@ -15,14 +14,12 @@ var expect = require('expect.js'),
   });
 
 var INVALID_JAR_FILE = './bin/unknown.jar',
-  VALID_JAR_FILE = './bin/BrowserStackTunnel.jar'
-  HOST_NAME = 'localhost',
-  PORT = 8080,
-  INVALID_PORT = 8081,
-  SSL_FLAG = 0,
-  CONFIG = require('../Support/BrowserStackConfig');
-
-var TEST_RESPONSE = 'This is a test';
+    VALID_JAR_FILE = './bin/BrowserStackTunnel.jar',
+    HOST_NAME = 'localhost',
+    PORT = 8080,
+    INVALID_PORT = 8081,
+    SSL_FLAG = 0,
+    CONFIG = require('../Support/BrowserStackConfig');
 
 describe('BrowserStackTunnel', function () {
   'use strict';
@@ -39,8 +36,8 @@ describe('BrowserStackTunnel', function () {
     });
     browserStackTunnel.start(function (error) {
       if (error) {
-        expect().fail(function () { return error });
-      } else if (browserStackTunnel.state == 'started') {
+        expect().fail(function () { return error; });
+      } else if (browserStackTunnel.state === 'started') {
         done();
       }
     });
@@ -129,11 +126,11 @@ describe('BrowserStackTunnel', function () {
 
     browserStackTunnel.start(function (error) {
       if (error) {
-        expect().fail(function () { return error });
+        expect().fail(function () { return error; });
       }
       browserStackTunnel.start(function (error) {
         expect(error.message).to.be('child already started');
-        done();        
+        done();
       });
 
       process.emit('mock:child_process:stdout:data', 'monkey-----  **Error: There is another JAR already running ----monkey');
@@ -154,7 +151,7 @@ describe('BrowserStackTunnel', function () {
     });
     browserStackTunnel.start(function (error) {
       if (error) {
-        expect().fail(function () { return error });
+        expect().fail(function () { return error; });
       }
       done();
     });

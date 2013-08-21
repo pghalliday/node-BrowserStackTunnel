@@ -37,7 +37,8 @@
 		"console",
 		"define",
 		"alert",
-		"dataInitialState"
+		"dataInitialState",
+		"process"
 	],
 	"white": true
 }
