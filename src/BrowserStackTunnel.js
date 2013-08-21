@@ -6,11 +6,12 @@ var util = require('util'),
 
 function BrowserStackTunnel(options) {
   'use strict';
-  var params = '',
-      stdoutData = '',
-      tunnel;
+  var params = '';
+
+  this.stdoutData = '',
+  this.tunnel = null;
     
-  options.jarFile = options.jarFile || __dirname + '/../bin/BrowserStackTunnel.jar';
+  options.jarFile = options.jarFile || './bin/BrowserStackTunnel.jar';
   options.hosts.forEach(function (host) {
     if (params.length > 0) {
       params += ',';
@@ -20,10 +21,11 @@ function BrowserStackTunnel(options) {
 
   this.state = 'stop';
   this.stateMatchers = {
-    'already_running': new RegExp('\\*\\*Error: There is another JAR already running.'),
+    'already_running': new RegExp('\\*\\*Error: There is another JAR already running'),
     'invalid_key': new RegExp('\\*\\*Error: You provided an invalid key'),
+    'connection_failure': new RegExp('\\*\\*Error: Could not connect to server'),
     'newer_avalible': new RegExp('There is a new version of BrowserStackTunnel.jar available on server'),
-    'start': new RegExp('Press Ctrl-C to exit')
+    'started': new RegExp('Press Ctrl-C to exit')
   };
 
   this.on('newer_avalible', function () {
@@ -35,29 +37,34 @@ function BrowserStackTunnel(options) {
     http.get('http://www.browserstack.com/BrowserStackTunnel.jar', function (response) {
       console.log('Downloading newer version...');
       
-      response.pipe(new_browserstack_lib);
       new_browserstack_lib.on('finish', function () {
         console.log('Downloading... Done');
         new_browserstack_lib.close();
-        self.startTunnel();
+        self.startTunnel();        
       });
+
+      response.pipe(new_browserstack_lib);
     });
   });
 
   this.on('invalid_key', function () {
-    this.emit('start', new Error('Invalid key'));
+    this.emit('started', new Error('Invalid key'));
+  });
+
+  this.on('connection_failure', function () {
+    this.emit('started', new Error('Could not connect to server'));
   });
 
   this.on('already_running', function () {
-    this.emit('start', new Error('child already started'));
+    this.emit('started', new Error('child already started'));
   });
 
   this.updateState = function (data) {
     var state;
+    this.stdoutData += data.toString();
 
-    stdoutData += data.toString();
     for (state in this.stateMatchers) {
-      if (this.stateMatchers.hasOwnProperty(state) && this.stateMatchers[state].test(stdoutData) && this.state !== state) {
+      if (this.stateMatchers.hasOwnProperty(state) && this.stateMatchers[state].test(this.stdoutData) && this.state !== state) {
         this.state = state;
         this.emit(state, null);
         break;
@@ -66,38 +73,41 @@ function BrowserStackTunnel(options) {
   };
 
   this.killTunnel = function () {
-    if (tunnel) {
-      tunnel.stdout.removeListener('data', this.updateState.bind(this));
-      tunnel.stderr.removeListener('data', this.updateState.bind(this));
-      tunnel.removeListener('error', this.exit.bind(this));
-      tunnel.kill();
-      tunnel = null;
+    if (this.tunnel) {
+      this.tunnel.stdout.removeAllListeners('data');
+      this.tunnel.stderr.removeAllListeners('data');
+      this.tunnel.removeAllListeners('error');
+      this.tunnel.kill();
+      this.tunnel = null;
     }
   };
 
   this.exit = function () {
-    if (this.state !== 'start') {
-      this.emit('start', new Error('child failed to start:\n' + stdoutData));
-    } else {
+    if (this.state !== 'started' && this.state !== 'newer_avalible') {
+      this.emit('started', new Error('child failed to start:\n' + this.stdoutData));
+    } else if (this.state !== 'newer_avalible') {
       this.state = 'stop';
       this.emit('stop');
     }
-
-    this.killTunnel();
   };
 
   this.startTunnel = function () {
-    tunnel = spawn('java', ['-jar', options.jarFile, options.key, params]);
+    if (!fs.existsSync(options.jarFile)) {
+        this.exit();
+        return;
+    }
     
-    tunnel.stdout.on('data', this.updateState.bind(this));
-    tunnel.stderr.on('data', this.updateState.bind(this));
-    tunnel.on('error', this.exit.bind(this));
-    tunnel.on('exit', this.exit.bind(this));
+    this.stdoutData = '';
+    this.tunnel = spawn('java', ['-jar', options.jarFile, options.key, params]);    
+    this.tunnel.stdout.on('data', this.updateState.bind(this));
+    this.tunnel.stderr.on('data', this.updateState.bind(this));
+    this.tunnel.on('error', this.killTunnel.bind(this));
+    this.tunnel.on('exit', this.exit.bind(this));
   };
 
   this.start = function (callback) {
-    this.once('start', callback);
-    if (this.state === 'start') {
+    this.once('started', callback);
+    if (this.state === 'started') {
       this.emit('already_running');
     } else {
       this.startTunnel();
@@ -106,8 +116,8 @@ function BrowserStackTunnel(options) {
 
   this.stop = function (callback) {
     this.once('stop', callback);
-    if (this.state !== 'start') {
-      this.emit('start', new Error('child not started'));
+    if (this.state !== 'started') {
+      this.emit('stop', new Error('child not started'));
     } 
 
     this.killTunnel();
