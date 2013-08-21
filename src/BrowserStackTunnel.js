@@ -85,7 +85,6 @@ function BrowserStackTunnel(options) {
   };
 
   this.exit = function () {
-    console.log('EXIT');
     if (this.state !== 'started' && this.state !== 'newer_avalible') {
       this.emit('started', new Error('child failed to start:\n' + this.stdoutData));
     } else if (this.state !== 'newer_avalible') {
