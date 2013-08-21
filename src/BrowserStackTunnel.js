@@ -1,14 +1,14 @@
 var util = require('util'),
   http = require('http'),
   fs = require('fs'),
-  path = require('path'),
   EventEmitter = require('events').EventEmitter,
   spawn = require('child_process').spawn;
 
 function BrowserStackTunnel(options) {
   'use strict';
   var params = '',
-    defaultJarPath = util.format('%s/bin/BrowserStackTunnel.jar', path.resolve('.'));
+    currentDir = __dirname ? __dirname + '/..' : '.',
+    defaultJarPath = util.format('%s/bin/BrowserStackTunnel.jar', currentDir);
 
   this.stdoutData = '';
   this.tunnel = null;
