@@ -25,6 +25,7 @@ tunnel.start(function(error) {
   } else {
     console.log('Tunnel established.');
   }
+  tunnel.killTunnel();
   process.exit();
 });
 
