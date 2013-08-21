@@ -97,7 +97,7 @@ function BrowserStackTunnel(options) {
   this.cleanUp = function () {
     this.stdoutData = '';
     process.removeListener('uncaughtException', this.exit.bind(this));
-  }
+  };
 
   this.startTunnel = function () {
     if (!fs.existsSync(options.jarFile)) {
