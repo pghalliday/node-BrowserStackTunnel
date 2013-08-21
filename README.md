@@ -12,6 +12,8 @@ http://www.browserstack.com/
 - should error if stopped before started
 - should error if no server listening on the specified host and port
 - should error if started when already running
+- should error if user provided an invalid key
+- should download new jar if promted that a new version exists, hence auto download doesnt work
 
 ## Installation
 
