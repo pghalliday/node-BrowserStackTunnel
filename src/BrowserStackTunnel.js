@@ -1,17 +1,19 @@
 var util = require('util'),
   http = require('http'),
   fs = require('fs'),
+  path = require('path'),
   EventEmitter = require('events').EventEmitter,
   spawn = require('child_process').spawn;
 
 function BrowserStackTunnel(options) {
   'use strict';
-  var params = '';
+  var params = '',
+    defaultJarPath = util.format('%s/bin/BrowserStackTunnel.jar', path.resolve('.'));
 
   this.stdoutData = '',
   this.tunnel = null;
     
-  options.jarFile = options.jarFile || './bin/BrowserStackTunnel.jar';
+  options.jarFile = options.jarFile || defaultJarPath;
   options.hosts.forEach(function (host) {
     if (params.length > 0) {
       params += ',';
@@ -96,7 +98,7 @@ function BrowserStackTunnel(options) {
         this.exit();
         return;
     }
-    
+
     this.stdoutData = '';
     this.tunnel = spawn('java', ['-jar', options.jarFile, options.key, params]);    
     this.tunnel.stdout.on('data', this.updateState.bind(this));

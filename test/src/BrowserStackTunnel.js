@@ -1,5 +1,6 @@
 var expect = require('expect.js'),
   mocks = require('mocks'),
+  path = require('path'),
   childProcessMock = require('../lib/mocks').childProcessMock,
   httpMock = require('../lib/mocks').httpMock,
   fsMock = require('../lib/mocks').fsMock,
@@ -14,11 +15,12 @@ var expect = require('expect.js'),
   });
 
 var INVALID_JAR_FILE = './bin/unknown.jar',
-    HOST_NAME = 'localhost',
-    PORT = 8080,
-    INVALID_PORT = 8081,
-    SSL_FLAG = 0,
-    CONFIG = require('../Support/BrowserStackConfig');
+  VALID_JAR_FILE = './bin/BrowserStackTunnel.jar'
+  HOST_NAME = 'localhost',
+  PORT = 8080,
+  INVALID_PORT = 8081,
+  SSL_FLAG = 0,
+  CONFIG = require('../Support/BrowserStackConfig');
 
 var TEST_RESPONSE = 'This is a test';
 
@@ -32,7 +34,8 @@ describe('BrowserStackTunnel', function () {
         name: HOST_NAME,
         port: PORT,
         sslFlag: SSL_FLAG
-      }]
+      }],
+      jarFile: VALID_JAR_FILE
     });
     browserStackTunnel.start(function (error) {
       if (error) {
@@ -68,7 +71,8 @@ describe('BrowserStackTunnel', function () {
         name: HOST_NAME,
         port: PORT,
         sslFlag: SSL_FLAG
-      }]
+      }],
+      jarFile: VALID_JAR_FILE
     });
     browserStackTunnel.stop(function (error) {
       expect(error.message).to.be('child not started');
@@ -83,7 +87,8 @@ describe('BrowserStackTunnel', function () {
         name: HOST_NAME,
         port: INVALID_PORT,
         sslFlag: SSL_FLAG
-      }]
+      }],
+      jarFile: VALID_JAR_FILE
     });
     browserStackTunnel.start(function (error) {
       expect(error.message).to.contain('Could not connect to server');
@@ -100,7 +105,8 @@ describe('BrowserStackTunnel', function () {
         name: HOST_NAME,
         port: PORT,
         sslFlag: SSL_FLAG
-      }]
+      }],
+      jarFile: VALID_JAR_FILE
     });
     browserStackTunnel.start(function (error) {
       expect(error.message).to.contain('Invalid key');
@@ -117,7 +123,8 @@ describe('BrowserStackTunnel', function () {
         name: HOST_NAME,
         port: PORT,
         sslFlag: SSL_FLAG
-      }]
+      }],
+      jarFile: VALID_JAR_FILE
     });
 
     browserStackTunnel.start(function (error) {
@@ -142,7 +149,8 @@ describe('BrowserStackTunnel', function () {
         name: HOST_NAME,
         port: PORT,
         sslFlag: SSL_FLAG
-      }]
+      }],
+      jarFile: VALID_JAR_FILE
     });
     browserStackTunnel.start(function (error) {
       if (error) {

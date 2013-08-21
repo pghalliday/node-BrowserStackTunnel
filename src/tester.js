@@ -21,9 +21,10 @@ var tunnel = new BrowserStackTunnel({
 
 tunnel.start(function(error) {
   if (error) {
-    console.log('Can not establish the tunnel.');
+    console.log(error);
   } else {
     console.log('Tunnel established.');
   }
+  process.exit();
 });
 
