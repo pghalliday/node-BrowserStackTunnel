@@ -1,6 +1,9 @@
 node-BrowserStackTunnel
 =========
 
+[![Build Status](https://travis-ci.org/pghalliday/node-BrowserStackTunnel.png)](https://travis-ci.org/pghalliday/node-BrowserStackTunnel)
+[![Dependency Status](https://gemnasium.com/pghalliday/node-BrowserStackTunnel.png)](https://gemnasium.com/pghalliday/node-BrowserStackTunnel)
+
 A Node.js wrapper for the BrowserStack java tunnel client
 
 http://www.browserstack.com/
