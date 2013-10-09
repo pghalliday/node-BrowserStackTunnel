@@ -19,14 +19,14 @@ var INVALID_JAR_FILE = './bin/unknown.jar',
     PORT = 8080,
     INVALID_PORT = 8081,
     SSL_FLAG = 0,
-    CONFIG = require('../Support/BrowserStackConfig');
+    KEY = 'This is a fake key';
 
 describe('BrowserStackTunnel', function () {
   'use strict';
 
   it('should start the tunnel using the default jar file included in the package', function (done) {
     var browserStackTunnel = new bs.BrowserStackTunnel({
-      key: CONFIG.key,
+      key: KEY,
       hosts: [{
         name: HOST_NAME,
         port: PORT,
@@ -47,7 +47,7 @@ describe('BrowserStackTunnel', function () {
   
   it('should error if an invalid jar file is specified', function (done) {
     var browserStackTunnel = new bs.BrowserStackTunnel({
-      key: CONFIG.key,
+      key: KEY,
       hosts: [{
         name: HOST_NAME,
         port: PORT,
@@ -63,7 +63,7 @@ describe('BrowserStackTunnel', function () {
   
   it('should error if stopped before started', function (done) {
     var browserStackTunnel = new bs.BrowserStackTunnel({
-      key: CONFIG.key,
+      key: KEY,
       hosts: [{
         name: HOST_NAME,
         port: PORT,
@@ -79,7 +79,7 @@ describe('BrowserStackTunnel', function () {
   
   it('should error if no server listening on the specified host and port', function (done) {
     var browserStackTunnel = new bs.BrowserStackTunnel({
-      key: CONFIG.key,
+      key: KEY,
       hosts: [{
         name: HOST_NAME,
         port: INVALID_PORT,
@@ -115,7 +115,7 @@ describe('BrowserStackTunnel', function () {
   
   it('should error if started when already running', function (done) {
     var browserStackTunnel = new bs.BrowserStackTunnel({
-      key: CONFIG.key,
+      key: KEY,
       hosts: [{
         name: HOST_NAME,
         port: PORT,

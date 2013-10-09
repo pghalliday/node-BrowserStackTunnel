@@ -61,23 +61,7 @@ browserStackTunnel.start(function(error) {
 
 ## Contributing
 
-In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using ``./grunt.sh`` or ``.\grunt.bat``.
-
-Additionally you will have to use you own BrowserStack credentials to run the tests. To set this add a config file in the location...
-
-``test/Support/BrowserStackConfig.js``
-
-with the following contents (substitute your own key as supplied by BrowserStack)...
-
-```Javascript
-module.exports = {
-  key: YOUR_KEY
-};
-```
-
-There is a template located at...
-
-``test/Support/BrowserStackConfig.example.js``
+In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using `npm test`.
 
 ## License
 Copyright (c) 2012 Peter Halliday  
