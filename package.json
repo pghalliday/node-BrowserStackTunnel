@@ -34,7 +34,8 @@
     "grunt-mocha-test": "~0.6.3",
     "grunt-contrib-jshint": "~0.6.2",
     "grunt-contrib-watch": "~0.5.1",
-    "mocks": "0.0.15"
+    "mocks": "0.0.15",
+    "grunt-cli": "~0.1.9"
   },
   "keywords": [
     "BrowserStack",
