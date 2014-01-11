@@ -6,7 +6,7 @@ var util = require('util'),
 
 function BrowserStackTunnel(options) {
   'use strict';
-  var params = '',
+  var params = [],
     currentDir = __dirname ? __dirname + '/..' : '.',
     defaultJarPath = util.format('%s/bin/BrowserStackTunnel.jar', currentDir);
 
@@ -15,11 +15,12 @@ function BrowserStackTunnel(options) {
     
   options.jarFile = options.jarFile || defaultJarPath;
   options.hosts.forEach(function (host) {
-    if (params.length > 0) {
-      params += ',';
-    }
-    params += host.name + ',' + host.port + ',' + host.sslFlag;
+    params.push(host.name + ',' + host.port + ',' + host.sslFlag);
   });
+
+  if (options.tunnelIdentifier) {
+    params.push('-tunnelIdentifier', options.tunnelIdentifier);
+  }
 
   this.state = 'stop';
   this.stateMatchers = {
@@ -105,7 +106,7 @@ function BrowserStackTunnel(options) {
     }
 
     this.cleanUp();
-    this.tunnel = spawn('java', ['-jar', options.jarFile, options.key, params]);
+    this.tunnel = spawn('java', ['-jar', options.jarFile, options.key].concat(params));
     this.tunnel.stdout.on('data', this.updateState.bind(this));
     this.tunnel.stderr.on('data', this.updateState.bind(this));
     this.tunnel.on('error', this.killTunnel.bind(this));
