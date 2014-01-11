@@ -14,12 +14,22 @@ function BrowserStackTunnel(options) {
   this.tunnel = null;
     
   options.jarFile = options.jarFile || defaultJarPath;
+
+  var hosts = '';
   options.hosts.forEach(function (host) {
-    params.push(host.name + ',' + host.port + ',' + host.sslFlag);
+    if (hosts.length > 0) {
+      hosts += ',';
+    }
+    hosts += host.name + ',' + host.port + ',' + host.sslFlag;
   });
+  params.push(hosts);
 
   if (options.tunnelIdentifier) {
     params.push('-tunnelIdentifier', options.tunnelIdentifier);
+  }
+
+  if (options.skipCheck) {
+    params.push('-skipCheck');
   }
 
   this.state = 'stop';

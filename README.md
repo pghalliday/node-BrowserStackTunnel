@@ -8,16 +8,6 @@ A Node.js wrapper for the BrowserStack java tunnel client
 
 http://www.browserstack.com/
 
-## Features
-
-- should start the tunnel using the default jar file included in the package
-- should error if an invalid jar file is specified
-- should error if stopped before started
-- should error if no server listening on the specified host and port
-- should error if started when already running
-- should error if user provided an invalid key
-- should download new jar if promted that a new version exists, hence auto download doesnt work
-
 ## Installation
 
 ```
@@ -35,7 +25,10 @@ var browserStackTunnel = new BrowserStackTunnel({
     name: 'localhost',
     port: 8080,
     sslFlag: 0
-  }]
+  }],
+  jarFile: 'your_jar_file', // optionally override the included BrowserStackTunnel.jar file
+  tunnelIdentifier: 'my_tunnel', // optionally set the -tunnelIdentifier option
+  skipCheck: true // optionally set the -skipCheck option
 });
 
 browserStackTunnel.start(function(error) {

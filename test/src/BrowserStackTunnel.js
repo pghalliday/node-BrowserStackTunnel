@@ -3,7 +3,12 @@ var expect = require('expect.js'),
   childProcessMock = require('../lib/mocks').childProcessMock,
   httpMock = require('../lib/mocks').httpMock,
   fsMock = require('../lib/mocks').fsMock,
-  bs = mocks.loadFile('./src/BrowserStackTunnel.js', {
+  sinon = require('sinon');
+
+var spawnSpy = sinon.spy(childProcessMock.spawn);
+childProcessMock.spawn = spawnSpy;
+
+var bs = mocks.loadFile('./src/BrowserStackTunnel.js', {
     child_process: childProcessMock,
     http: httpMock,
     fs: fsMock.create({
@@ -19,31 +24,14 @@ var INVALID_JAR_FILE = './bin/unknown.jar',
     PORT = 8080,
     INVALID_PORT = 8081,
     SSL_FLAG = 0,
-    KEY = 'This is a fake key';
+    KEY = 'This is a fake key',
+    HOST_NAME2 = 'localhost2',
+    PORT2 = 8081,
+    SSL_FLAG2 = 1,
+    DEFAULT_JAR_FILE = 'src/../bin/BrowserStackTunnel.jar';
 
 describe('BrowserStackTunnel', function () {
   'use strict';
-
-  it('should start the tunnel using the default jar file included in the package', function (done) {
-    var browserStackTunnel = new bs.BrowserStackTunnel({
-      key: KEY,
-      hosts: [{
-        name: HOST_NAME,
-        port: PORT,
-        sslFlag: SSL_FLAG
-      }],
-      jarFile: VALID_JAR_FILE
-    });
-    browserStackTunnel.start(function (error) {
-      if (error) {
-        expect().fail(function () { return error; });
-      } else if (browserStackTunnel.state === 'started') {
-        done();
-      }
-    });
-
-    process.emit('mock:child_process:stdout:data', 'monkey-----  Press Ctrl-C to exit ----monkey');
-  });
   
   it('should error if an invalid jar file is specified', function (done) {
     var browserStackTunnel = new bs.BrowserStackTunnel({
@@ -160,6 +148,172 @@ describe('BrowserStackTunnel', function () {
     setTimeout(function () {
       process.emit('mock:child_process:stdout:data', 'monkey-----  Press Ctrl-C to exit ----monkey');
     }, 100);
+  });
+
+  it('should support a single host with the default jar file', function (done) {
+    spawnSpy.reset();
+    var browserStackTunnel = new bs.BrowserStackTunnel({
+      key: KEY,
+      hosts: [{
+        name: HOST_NAME,
+        port: PORT,
+        sslFlag: SSL_FLAG
+      }],
+    });
+    browserStackTunnel.start(function (error) {
+      if (error) {
+        expect().fail(function () { return error; });
+      } else if (browserStackTunnel.state === 'started') {
+        sinon.assert.calledOnce(spawnSpy);
+        sinon.assert.calledWithExactly(
+          spawnSpy,
+          'java', [
+            '-jar',
+            DEFAULT_JAR_FILE,
+            KEY,
+            HOST_NAME + ',' + PORT + ',' + SSL_FLAG
+          ]
+        );
+        done();
+      }
+    });
+
+    process.emit('mock:child_process:stdout:data', 'monkey-----  Press Ctrl-C to exit ----monkey');
+  });
+
+  it('should support multiple hosts', function (done) {
+    spawnSpy.reset();
+    var browserStackTunnel = new bs.BrowserStackTunnel({
+      key: KEY,
+      hosts: [{
+        name: HOST_NAME,
+        port: PORT,
+        sslFlag: SSL_FLAG
+      }, {
+        name: HOST_NAME2,
+        port: PORT2,
+        sslFlag: SSL_FLAG2
+      }]
+    });
+    browserStackTunnel.start(function (error) {
+      if (error) {
+        expect().fail(function () { return error; });
+      } else if (browserStackTunnel.state === 'started') {
+        sinon.assert.calledOnce(spawnSpy);
+        sinon.assert.calledWithExactly(
+          spawnSpy,
+          'java', [
+            '-jar',
+            DEFAULT_JAR_FILE,
+            KEY,
+            HOST_NAME + ',' + PORT + ',' + SSL_FLAG + ',' + HOST_NAME2 + ',' + PORT2 + ',' + SSL_FLAG2
+          ]
+        );
+        done();
+      }
+    });
+
+    process.emit('mock:child_process:stdout:data', 'monkey-----  Press Ctrl-C to exit ----monkey');
+  });
+
+  it('should use the specified jar file', function (done) {
+    spawnSpy.reset();
+    var browserStackTunnel = new bs.BrowserStackTunnel({
+      key: KEY,
+      hosts: [{
+        name: HOST_NAME,
+        port: PORT,
+        sslFlag: SSL_FLAG,
+        tunnelIdentifier: 'my_tunnel'
+      }],
+      jarFile: VALID_JAR_FILE
+    });
+    browserStackTunnel.start(function (error) {
+      if (error) {
+        expect().fail(function () { return error; });
+      } else if (browserStackTunnel.state === 'started') {
+        sinon.assert.calledOnce(spawnSpy);
+        sinon.assert.calledWithExactly(
+          spawnSpy,
+          'java', [
+            '-jar',
+            VALID_JAR_FILE,
+            KEY,
+            HOST_NAME + ',' + PORT + ',' + SSL_FLAG
+          ]
+        );
+        done();
+      }
+    });
+
+    process.emit('mock:child_process:stdout:data', 'monkey-----  Press Ctrl-C to exit ----monkey');
+  });
+
+  it('should support the tunnelIdentifier option', function (done) {
+    spawnSpy.reset();
+    var browserStackTunnel = new bs.BrowserStackTunnel({
+      key: KEY,
+      hosts: [{
+        name: HOST_NAME,
+        port: PORT,
+        sslFlag: SSL_FLAG
+      }],
+      tunnelIdentifier: 'my_tunnel'
+    });
+    browserStackTunnel.start(function (error) {
+      if (error) {
+        expect().fail(function () { return error; });
+      } else if (browserStackTunnel.state === 'started') {
+        sinon.assert.calledOnce(spawnSpy);
+        sinon.assert.calledWithExactly(
+          spawnSpy,
+          'java', [
+            '-jar',
+            DEFAULT_JAR_FILE,
+            KEY,
+            HOST_NAME + ',' + PORT + ',' + SSL_FLAG,
+            '-tunnelIdentifier',
+            'my_tunnel'
+          ]
+        );
+        done();
+      }
+    });
+
+    process.emit('mock:child_process:stdout:data', 'monkey-----  Press Ctrl-C to exit ----monkey');
+  });
+
+  it('should support the skipCheck option', function (done) {
+    spawnSpy.reset();
+    var browserStackTunnel = new bs.BrowserStackTunnel({
+      key: KEY,
+      hosts: [{
+        name: HOST_NAME,
+        port: PORT,
+        sslFlag: SSL_FLAG
+      }],
+      skipCheck: true
+    });
+    browserStackTunnel.start(function (error) {
+      if (error) {
+        expect().fail(function () { return error; });
+      } else if (browserStackTunnel.state === 'started') {
+        sinon.assert.calledOnce(spawnSpy);
+        sinon.assert.calledWithExactly(
+          spawnSpy,
+          'java', [
+            '-jar',
+            DEFAULT_JAR_FILE,
+            KEY,
+            HOST_NAME + ',' + PORT + ',' + SSL_FLAG,
+            '-skipCheck'
+          ]
+        );
+        done();
+      }
+    });
+
+    process.emit('mock:child_process:stdout:data', 'monkey-----  Press Ctrl-C to exit ----monkey');
   });
 
   after(function () {
