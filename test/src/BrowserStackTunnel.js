@@ -317,9 +317,6 @@ describe('BrowserStackTunnel', function () {
   });
 
   after(function () {
-    process.removeAllListeners('mock:child_process:stdout:data');
-    process.removeAllListeners('mock:child_process:stderr:data');
-    process.removeAllListeners('mock:child_process:error');
-    process.removeAllListeners('mock:child_process:exit');
+    childProcessMock.cleanUp();
   });
 });

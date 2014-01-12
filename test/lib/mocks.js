@@ -2,44 +2,49 @@ var util = require('util'),
 	mocks = require('mocks'),
 	EventEmitter = require('events').EventEmitter;
 
-var childProcess = {};
-childProcess.spawn = function (cmd, args) {
-	function std() {}
+var childProcess = {
+	cleanUp: function() {
+	  process.removeAllListeners('mock:child_process:stdout:data');
+	  process.removeAllListeners('mock:child_process:stderr:data');
+	  process.removeAllListeners('mock:child_process:error');
+	  process.removeAllListeners('mock:child_process:exit');	
+	},
 
-	function mockProcess(cmd, args) {
-		var self = this;
+	spawn: function (cmd, args) {
+		function std() {}
 
-		this.stdout = new std();
-		this.stderr = new std();
-		this.kill = function () {
-			self.emit('exit');	
-		};
+		function mockProcess(cmd, args) {
+			var self = this;
 
-		process.removeAllListeners('mock:child_process:stdout:data');
-	    process.removeAllListeners('mock:child_process:stderr:data');
-	    process.removeAllListeners('mock:child_process:error');
-	    process.removeAllListeners('mock:child_process:exit');		
+			this.stdout = new std();
+			this.stderr = new std();
+			this.kill = function () {
+				self.emit('exit');	
+			};
 
-		process.on('mock:child_process:stdout:data', function(data) {
-			self.stdout.emit('data', data);
-		});
+			childProcess.cleanUp();
 
-		process.on('mock:child_process:stderr:data', function(data) {
-			self.stderr.emit('data', data);
-		});
+			process.on('mock:child_process:stdout:data', function(data) {
+				self.stdout.emit('data', data);
+			});
 
-		process.on('mock:child_process:error', function(data) {
-			self.emit('error', data);
-		});
+			process.on('mock:child_process:stderr:data', function(data) {
+				self.stderr.emit('data', data);
+			});
 
-		process.on('mock:child_process:exit', function(data) {
-			self.emit('exit', data);
-		});
-	}
+			process.on('mock:child_process:error', function(data) {
+				self.emit('error', data);
+			});
 
-	util.inherits(std, EventEmitter);
-	util.inherits(mockProcess, EventEmitter);
-	return new mockProcess(cmd, args);
+			process.on('mock:child_process:exit', function(data) {
+				self.emit('exit', data);
+			});
+		}
+
+		util.inherits(std, EventEmitter);
+		util.inherits(mockProcess, EventEmitter);
+		return new mockProcess(cmd, args);
+	}		
 };
 
 var ServerResponse = function () {
