@@ -1,7 +1,7 @@
 {
   "name": "browserstacktunnel-wrapper",
   "description": "A Node.js wrapper for the BrowserStack java tunnel client ",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "homepage": "https://github.com/pghalliday/node-BrowserStackTunnel.git",
   "author": {
     "name": "Peter Halliday",
