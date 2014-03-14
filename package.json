@@ -36,12 +36,18 @@
     "grunt-contrib-watch": "~0.5.1",
     "mocks": "0.0.15",
     "grunt-cli": "~0.1.9",
-    "sinon": "~1.7.3"
+    "sinon": "~1.7.3",
+    "tunnel-stream": "0.0.1",
+    "pipette": "^0.9.3"
   },
   "keywords": [
     "BrowserStack",
     "BrowserStackTunnel",
     "spawn",
     "child_process"
-  ]
+  ],
+  "dependencies": {
+    "unzip": "^0.1.9",
+    "fstream": "^0.1.25"
+  }
 }

@@ -50,7 +50,10 @@ var childProcess = {
 var ServerResponse = function () {
 	var response = new mocks.http.ServerResponse();
 	response.pipe = function (stream) {
-		stream.emit('finish');
+		process.nextTick(function () {
+			stream.emit('finish');
+		});
+		return stream;
 	}
 
 	return response;
@@ -58,32 +61,62 @@ var ServerResponse = function () {
 
 var ServerRequest = {
 	get: function(url, callback) {
+		ServerRequest.url = url;
 		callback(ServerResponse());
 	}
 };
 
-var fileSystem = {
-	create: function () {
-		function File(fileName) {
-			this.fileName = fileName;
-			this.close = function () {};
-		}
+var fileSystem = mocks.fs.create({
+  bin: {
+    'BrowserStackTunnel.jar': 1,
+  	darwin: {
+      'BrowserStackTunnel': 1
+  	},
+  	linux32: {
+      'BrowserStackTunnel': 1
+  	},
+  	linux64: {
+      'BrowserStackTunnel': 1
+  	}
+  }
+});
 
-		var fs = mocks.fs.create({
-	      bin: {
-	        'BrowserStackTunnel.jar': 1
-	      }
-	    });
+function File() {
+	this.close = function () {};
+}
+util.inherits(File, EventEmitter);
 
-		util.inherits(File, EventEmitter);
-	    fs.createWriteStream = function(fileName){
-	    	return new File();
-	    };	
+fileSystem.createWriteStream = function (fileName) {
+	fileSystem.fileName = fileName;
+	return new File();
+};
 
-	    return fs;
-	}	
+var fstream = {};
+fstream.Writer = function (fileName) {
+	fstream.fileName = fileName;
+	return new File();
+};
+
+function Pipe() {
+	this.pipe = function (stream) {
+		this.on('finish', function () {
+			process.nextTick(function () {
+				stream.emit('finish');
+			});
+		});
+		return stream;
+	};
+}
+util.inherits(Pipe, EventEmitter);
+
+var unzip = {};
+unzip.Parse = function () {
+	var pipe = new Pipe();
+	return pipe;
 };
 
 exports.childProcessMock = childProcess;
 exports.httpMock = ServerRequest;
 exports.fsMock = fileSystem;
+exports.fstreamMock = fstream;
+exports.unzipMock = unzip;
