@@ -1,6 +1,6 @@
 var path = require('path'),
     http = require('http'),
-    fs = require('fs');
+    fs = require('fs-extra');
 
 function JarBinary(filename) {
   'use strict';
@@ -11,11 +11,12 @@ function JarBinary(filename) {
   self.args = ['-jar', self.path];
 
   self.update = function (callback) {
+    fs.createFileSync(self.path);
     var jarFileStream = fs.createWriteStream(self.path);
     http.get('http://www.browserstack.com/BrowserStackTunnel.jar', function (response) {
-      console.log('Downloading newer version...');
+      console.log('BrowserStackTunnel: download jar file ...');
       jarFileStream.on('finish', function () {
-        console.log('Downloading... Done');
+        console.log('BrowserStackTunnel: download complete');
         jarFileStream.close();
         callback();
       });

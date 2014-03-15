@@ -7,7 +7,7 @@ var mocks = require('mocks'),
 
 var jb = mocks.loadFile('./src/JarBinary.js', {
   http: httpMock,
-  fs: fsMock
+  'fs-extra': fsMock
 });
 var JarBinary = jb.JarBinary;
 
@@ -45,6 +45,7 @@ describe('JarBinary', function () {
     describe('#update', function () {
       it('should download the jar file', function (done) {
         jarBinary.update(function () {
+          expect(fsMock.fileNameCreated).to.equal(DEFAULT_JAR_FILE);
           expect(fsMock.fileName).to.equal(DEFAULT_JAR_FILE);
           expect(httpMock.url).to.equal(JAR_URL);
           done();
@@ -73,6 +74,7 @@ describe('JarBinary', function () {
     describe('#update', function () {
       it('should download the jar file', function (done) {
         jarBinary.update(function () {
+          expect(fsMock.fileNameCreated).to.equal(OTHER_JAR_FILE);
           expect(fsMock.fileName).to.equal(OTHER_JAR_FILE);
           expect(httpMock.url).to.equal(JAR_URL);
           done();

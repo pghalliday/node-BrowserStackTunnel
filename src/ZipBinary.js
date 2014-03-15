@@ -1,26 +1,29 @@
 var path = require('path'),
     https = require('https'),
     unzip = require('unzip'),
-    fstream = require('fstream');
+    fs = require('fs');
 
-function ZipBinary(platform, arch, filename) {
+function ZipBinary(platform, arch, bin) {
   'use strict';
 
   var self = this;
-  self.path = filename || path.resolve(path.join(__dirname, '..', 'bin', platform, arch, 'BrowserStackLocal'));
+  self.bin = bin || path.resolve(path.join(__dirname, '..', 'bin', platform, arch));
+  self.path = path.resolve(path.join(self.bin, 'BrowserStackLocal'));
   self.command = self.path;
   self.args = [];
 
   self.update = function (callback) {
-    var binaryFileStream = fstream.Writer(self.path);
+    var extractStream = unzip.Extract({
+      path: self.bin
+    });
     https.get('https://www.browserstack.com/browserstack-local/BrowserStackLocal-' + platform + '-' + arch + '.zip', function (response) {
-      console.log('Downloading newer version...');
-      binaryFileStream.on('finish', function () {
-        console.log('Downloading... Done');
-        binaryFileStream.close();
-        callback();
+      console.log('BrowserStackTunnel: download binary for ' + platform + '-' + arch + ' ...');
+      extractStream.on('close', function () {
+        console.log('BrowserStackTunnel: download complete');
+        console.log('BrowserStackTunnel: chmod 0755 binary');
+        fs.chmod(self.path, '0755', callback);
       });
-      response.pipe(unzip.Parse()).pipe(binaryFileStream);
+      response.pipe(extractStream);
     });
   };
 }

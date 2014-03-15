@@ -11,19 +11,19 @@ function BrowserStackTunnel(options) {
   var params = [];
 
   var binary;
-  switch (os.platform) {
+  switch (os.platform()) {
   case 'linux':
-    switch (os.arch) {
+    switch (os.arch()) {
     case 'x64':
-      binary = new ZipBinary('linux', 'x64', options.linux64File);
+      binary = new ZipBinary('linux', 'x64', options.linux64Bin);
       break;
     case 'ia32':
-      binary = new ZipBinary('linux', 'ia32', options.linux32File);
+      binary = new ZipBinary('linux', 'ia32', options.linux32Bin);
       break;
     }
     break;
   case 'darwin':
-    binary = new ZipBinary('darwin', 'x64', options.osxFile);
+    binary = new ZipBinary('darwin', 'x64', options.osxBin);
     break;
   default:
     binary = new JarBinary(options.jarFile);
@@ -60,6 +60,7 @@ function BrowserStackTunnel(options) {
   };
 
   this.on('newer_available', function () {
+    console.log('BrowserStackTunnel: binary out of date');
     this.killTunnel();
     var self = this;
     binary.update(function () {
@@ -82,7 +83,6 @@ function BrowserStackTunnel(options) {
   this.updateState = function (data) {
     var state;
     this.stdoutData += data.toString();
-
     for (state in this.stateMatchers) {
       if (this.stateMatchers.hasOwnProperty(state) && this.stateMatchers[state].test(this.stdoutData) && this.state !== state) {
         this.state = state;
@@ -116,12 +116,7 @@ function BrowserStackTunnel(options) {
     process.removeListener('uncaughtException', this.exit.bind(this));
   };
 
-  this.startTunnel = function () {
-    if (!fs.existsSync(binary.path)) {
-      this.exit();
-      return;
-    }
-
+  this._startTunnel = function () {
     this.cleanUp();
     this.tunnel = spawn(binary.command, binary.args.concat([options.key]).concat(params));
     this.tunnel.stdout.on('data', this.updateState.bind(this));
@@ -130,6 +125,18 @@ function BrowserStackTunnel(options) {
     this.tunnel.on('exit', this.exit.bind(this));
 
     process.on('uncaughtException', this.killTunnel.bind(this));
+  };
+
+  this.startTunnel = function () {
+    if (!fs.existsSync(binary.path)) {
+      console.log('BrowserStackTunnel: binary not present');
+      var self = this;
+      binary.update(function () {
+        self._startTunnel();
+      });
+    } else {
+      this._startTunnel();
+    }
   };
 
   this.start = function (callback) {

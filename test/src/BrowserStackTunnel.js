@@ -3,8 +3,8 @@ var expect = require('expect.js'),
     childProcessMock = require('../lib/mocks').childProcessMock,
     httpMock = require('../lib/mocks').httpMock,
     fsMock = require('../lib/mocks').fsMock,
-    fstreamMock = require('../lib/mocks').fstreamMock,
     unzipMock = require('../lib/mocks').unzipMock,
+    osMock = require('../lib/mocks').osMock,
     sinon = require('sinon');
 
 var spawnSpy = sinon.spy(childProcessMock.spawn);
@@ -12,18 +12,16 @@ childProcessMock.spawn = spawnSpy;
 
 var jb = mocks.loadFile('./src/JarBinary.js', {
   http: httpMock,
-  fs: fsMock
+  'fs-extra': fsMock
 });
 var JarBinary = jb.JarBinary;
 
 var zb = mocks.loadFile('./src/ZipBinary.js', {
   https: httpMock,
-  fstream: fstreamMock,
+  fs: fsMock,
   unzip: unzipMock
 });
 var ZipBinary = zb.ZipBinary;
-
-var osMock = {};
 
 var bs = mocks.loadFile('./src/BrowserStackTunnel.js', {
   child_process: childProcessMock,
@@ -34,11 +32,16 @@ var bs = mocks.loadFile('./src/BrowserStackTunnel.js', {
   './ZipBinary': ZipBinary
 });
 
-var INVALID_JAR_FILE = '/bin/unknown.jar',
-    VALID_JAR_FILE = '/bin/BrowserStackTunnel.jar',
-    OSX_BINARY_FILE = '/bin/darwin/BrowserStackTunnel',
-    LINUX_64_BINARY_FILE = '/bin/linux64/BrowserStackTunnel',
-    LINUX_32_BINARY_FILE = '/bin/linux32/BrowserStackTunnel',
+var NEW_BINARY_DIR = '/bin/new',
+    NEW_BINARY_FILE = NEW_BINARY_DIR + '/BrowserStackLocal',
+    JAR_FILE = '/bin/BrowserStackTunnel.jar',
+    NEW_JAR_FILE = '/bin/new/BrowserStackTunnel.jar',
+    OSX_BINARY_DIR = '/bin/darwin',
+    OSX_BINARY_FILE = OSX_BINARY_DIR + '/BrowserStackLocal',
+    LINUX_64_BINARY_DIR = '/bin/linux64',
+    LINUX_64_BINARY_FILE = LINUX_64_BINARY_DIR + '/BrowserStackLocal',
+    LINUX_32_BINARY_DIR = '/bin/linux32',
+    LINUX_32_BINARY_FILE = LINUX_32_BINARY_DIR + '/BrowserStackLocal',
     JAR_URL = 'http://www.browserstack.com/BrowserStackTunnel.jar',
     OSX_BINARY_URL = 'https://www.browserstack.com/browserstack-local/BrowserStackLocal-darwin-x64.zip',
     LINUX_64_BINARY_URL = 'https://www.browserstack.com/browserstack-local/BrowserStackLocal-linux-x64.zip',
@@ -56,29 +59,16 @@ describe('BrowserStackTunnel', function () {
   'use strict';
 
   beforeEach(function () {
+    fsMock.fileNameModded = undefined;
+    fsMock.mode = undefined;
+    fsMock.fileNameCreated = undefined;
     fsMock.fileName = undefined;
-    fstreamMock.fileName = undefined;
+    unzipMock.dirName = undefined;
     httpMock.url = undefined;
-    osMock.platform = 'unknown';
-    osMock.arch = 'unknown';
+    osMock._platform = 'unknown';
+    osMock._arch = 'unknown';
   });
-  
-  it('should error if an invalid jar file is specified', function (done) {
-    var browserStackTunnel = new bs.BrowserStackTunnel({
-      key: KEY,
-      hosts: [{
-        name: HOST_NAME,
-        port: PORT,
-        sslFlag: SSL_FLAG
-      }],
-      jarFile: INVALID_JAR_FILE
-    });
-    browserStackTunnel.start(function (error) {
-      expect(error.message).to.contain('child failed to start');
-      done();
-    });
-  });
-  
+    
   it('should error if stopped before started', function (done) {
     var browserStackTunnel = new bs.BrowserStackTunnel({
       key: KEY,
@@ -87,7 +77,7 @@ describe('BrowserStackTunnel', function () {
         port: PORT,
         sslFlag: SSL_FLAG
       }],
-      jarFile: VALID_JAR_FILE
+      jarFile: JAR_FILE
     });
     browserStackTunnel.stop(function (error) {
       expect(error.message).to.be('child not started');
@@ -103,7 +93,7 @@ describe('BrowserStackTunnel', function () {
         port: INVALID_PORT,
         sslFlag: SSL_FLAG
       }],
-      jarFile: VALID_JAR_FILE
+      jarFile: JAR_FILE
     });
     browserStackTunnel.start(function (error) {
       expect(error.message).to.contain('Could not connect to server');
@@ -121,7 +111,7 @@ describe('BrowserStackTunnel', function () {
         port: PORT,
         sslFlag: SSL_FLAG
       }],
-      jarFile: VALID_JAR_FILE
+      jarFile: JAR_FILE
     });
     browserStackTunnel.start(function (error) {
       expect(error.message).to.contain('Invalid key');
@@ -139,7 +129,7 @@ describe('BrowserStackTunnel', function () {
         port: PORT,
         sslFlag: SSL_FLAG
       }],
-      jarFile: VALID_JAR_FILE
+      jarFile: JAR_FILE
     });
 
     browserStackTunnel.start(function (error) {
@@ -157,7 +147,7 @@ describe('BrowserStackTunnel', function () {
     process.emit('mock:child_process:stdout:data', 'monkey-----  Press Ctrl-C to exit ----monkey');
   });
 
-  it('should download new jar if prompted that a new version exists, hence auto download doesnt work', function (done) {
+  it('should download new jar if prompted that a new version exists as auto download is not compatible with our use of spawn', function (done) {
     var browserStackTunnel = new bs.BrowserStackTunnel({
       key: 'MONKEY_KEY',
       hosts: [{
@@ -165,13 +155,14 @@ describe('BrowserStackTunnel', function () {
         port: PORT,
         sslFlag: SSL_FLAG
       }],
-      jarFile: VALID_JAR_FILE
+      jarFile: JAR_FILE
     });
     browserStackTunnel.start(function (error) {
       if (error) {
         expect().fail(function () { return error; });
       }
-      expect(fsMock.fileName).to.equal(VALID_JAR_FILE);
+      expect(fsMock.fileNameCreated).to.equal(JAR_FILE);
+      expect(fsMock.fileName).to.equal(JAR_FILE);
       expect(httpMock.url).to.equal(JAR_URL);
       done();
     });
@@ -195,7 +186,7 @@ describe('BrowserStackTunnel', function () {
         port: PORT2,
         sslFlag: SSL_FLAG2
       }],
-      jarFile: VALID_JAR_FILE
+      jarFile: JAR_FILE
     });
     browserStackTunnel.start(function (error) {
       if (error) {
@@ -206,7 +197,7 @@ describe('BrowserStackTunnel', function () {
           spawnSpy,
           'java', [
             '-jar',
-            VALID_JAR_FILE,
+            JAR_FILE,
             KEY,
             HOST_NAME + ',' + PORT + ',' + SSL_FLAG + ',' + HOST_NAME2 + ',' + PORT2 + ',' + SSL_FLAG2
           ]
@@ -228,7 +219,7 @@ describe('BrowserStackTunnel', function () {
         sslFlag: SSL_FLAG,
         tunnelIdentifier: 'my_tunnel'
       }],
-      jarFile: VALID_JAR_FILE
+      jarFile: JAR_FILE
     });
     browserStackTunnel.start(function (error) {
       if (error) {
@@ -239,7 +230,7 @@ describe('BrowserStackTunnel', function () {
           spawnSpy,
           'java', [
             '-jar',
-            VALID_JAR_FILE,
+            JAR_FILE,
             KEY,
             HOST_NAME + ',' + PORT + ',' + SSL_FLAG
           ]
@@ -261,7 +252,7 @@ describe('BrowserStackTunnel', function () {
         sslFlag: SSL_FLAG
       }],
       tunnelIdentifier: 'my_tunnel',
-      jarFile: VALID_JAR_FILE
+      jarFile: JAR_FILE
     });
     browserStackTunnel.start(function (error) {
       if (error) {
@@ -272,7 +263,7 @@ describe('BrowserStackTunnel', function () {
           spawnSpy,
           'java', [
             '-jar',
-            VALID_JAR_FILE,
+            JAR_FILE,
             KEY,
             HOST_NAME + ',' + PORT + ',' + SSL_FLAG,
             '-tunnelIdentifier',
@@ -296,7 +287,7 @@ describe('BrowserStackTunnel', function () {
         sslFlag: SSL_FLAG
       }],
       skipCheck: true,
-      jarFile: VALID_JAR_FILE
+      jarFile: JAR_FILE
     });
     browserStackTunnel.start(function (error) {
       if (error) {
@@ -307,7 +298,7 @@ describe('BrowserStackTunnel', function () {
           spawnSpy,
           'java', [
             '-jar',
-            VALID_JAR_FILE,
+            JAR_FILE,
             KEY,
             HOST_NAME + ',' + PORT + ',' + SSL_FLAG,
             '-skipCheck'
@@ -322,11 +313,11 @@ describe('BrowserStackTunnel', function () {
 
   describe('on windows', function () {
     beforeEach(function () {
-      osMock.platform = 'win32';
-      osMock.arch = 'x64';
+      osMock._platform = 'win32';
+      osMock._arch = 'x64';
     });
 
-    it('should download new jar if prompted that a new version exists, hence auto download doesnt work', function (done) {
+    it('should download new binary if binary is not present', function (done) {
       var browserStackTunnel = new bs.BrowserStackTunnel({
         key: 'MONKEY_KEY',
         hosts: [{
@@ -334,13 +325,39 @@ describe('BrowserStackTunnel', function () {
           port: PORT,
           sslFlag: SSL_FLAG
         }],
-        jarFile: VALID_JAR_FILE
+        jarFile: NEW_JAR_FILE
       });
       browserStackTunnel.start(function (error) {
         if (error) {
           expect().fail(function () { return error; });
         }
-        expect(fsMock.fileName).to.equal(VALID_JAR_FILE);
+        expect(fsMock.fileNameCreated).to.equal(NEW_JAR_FILE);
+        expect(fsMock.fileName).to.equal(NEW_JAR_FILE);
+        expect(httpMock.url).to.equal(JAR_URL);
+        done();
+      });
+
+      setTimeout(function () {
+        process.emit('mock:child_process:stdout:data', 'monkey-----  Press Ctrl-C to exit ----monkey');
+      }, 100);
+    });
+
+    it('should download new jar if prompted that a new version exists as auto download is not compatible with our use of spawn', function (done) {
+      var browserStackTunnel = new bs.BrowserStackTunnel({
+        key: 'MONKEY_KEY',
+        hosts: [{
+          name: HOST_NAME,
+          port: PORT,
+          sslFlag: SSL_FLAG
+        }],
+        jarFile: JAR_FILE
+      });
+      browserStackTunnel.start(function (error) {
+        if (error) {
+          expect().fail(function () { return error; });
+        }
+        expect(fsMock.fileNameCreated).to.equal(JAR_FILE);
+        expect(fsMock.fileName).to.equal(JAR_FILE);
         expect(httpMock.url).to.equal(JAR_URL);
         done();
       });
@@ -361,7 +378,7 @@ describe('BrowserStackTunnel', function () {
           sslFlag: SSL_FLAG,
           tunnelIdentifier: 'my_tunnel'
         }],
-        jarFile: VALID_JAR_FILE
+        jarFile: JAR_FILE
       });
       browserStackTunnel.start(function (error) {
         if (error) {
@@ -372,7 +389,7 @@ describe('BrowserStackTunnel', function () {
             spawnSpy,
             'java', [
               '-jar',
-              VALID_JAR_FILE,
+              JAR_FILE,
               KEY,
               HOST_NAME + ',' + PORT + ',' + SSL_FLAG
             ]
@@ -387,11 +404,11 @@ describe('BrowserStackTunnel', function () {
 
   describe('on osx', function () {
     beforeEach(function () {
-      osMock.platform = 'darwin';
-      osMock.arch = 'x64';
+      osMock._platform = 'darwin';
+      osMock._arch = 'x64';
     });
 
-    it('should download new jar if prompted that a new version exists, hence auto download doesnt work', function (done) {
+    it('should download new binary if binary is not present', function (done) {
       var browserStackTunnel = new bs.BrowserStackTunnel({
         key: 'MONKEY_KEY',
         hosts: [{
@@ -399,13 +416,41 @@ describe('BrowserStackTunnel', function () {
           port: PORT,
           sslFlag: SSL_FLAG
         }],
-        osxFile: OSX_BINARY_FILE
+        osxBin: NEW_BINARY_DIR
       });
       browserStackTunnel.start(function (error) {
         if (error) {
           expect().fail(function () { return error; });
         }
-        expect(fstreamMock.fileName).to.equal(OSX_BINARY_FILE);
+        expect(fsMock.fileNameModded).to.equal(NEW_BINARY_FILE);
+        expect(fsMock.mode).to.equal('0755');
+        expect(unzipMock.dirName).to.equal(NEW_BINARY_DIR);
+        expect(httpMock.url).to.equal(OSX_BINARY_URL);
+        done();
+      });
+
+      setTimeout(function () {
+        process.emit('mock:child_process:stdout:data', 'monkey-----  Press Ctrl-C to exit ----monkey');
+      }, 100);
+    });
+
+    it('should download new binary if prompted that a new version exists as auto download is not compatible with our use of spawn', function (done) {
+      var browserStackTunnel = new bs.BrowserStackTunnel({
+        key: 'MONKEY_KEY',
+        hosts: [{
+          name: HOST_NAME,
+          port: PORT,
+          sslFlag: SSL_FLAG
+        }],
+        osxBin: OSX_BINARY_DIR
+      });
+      browserStackTunnel.start(function (error) {
+        if (error) {
+          expect().fail(function () { return error; });
+        }
+        expect(fsMock.fileNameModded).to.equal(OSX_BINARY_FILE);
+        expect(fsMock.mode).to.equal('0755');
+        expect(unzipMock.dirName).to.equal(OSX_BINARY_DIR);
         expect(httpMock.url).to.equal(OSX_BINARY_URL);
         done();
       });
@@ -416,7 +461,7 @@ describe('BrowserStackTunnel', function () {
       }, 100);
     });
 
-    it('should use the specified jar file', function (done) {
+    it('should use the specified bin directory', function (done) {
       spawnSpy.reset();
       var browserStackTunnel = new bs.BrowserStackTunnel({
         key: KEY,
@@ -426,7 +471,7 @@ describe('BrowserStackTunnel', function () {
           sslFlag: SSL_FLAG,
           tunnelIdentifier: 'my_tunnel'
         }],
-        osxFile: OSX_BINARY_FILE
+        osxBin: OSX_BINARY_DIR
       });
       browserStackTunnel.start(function (error) {
         if (error) {
@@ -450,11 +495,11 @@ describe('BrowserStackTunnel', function () {
 
   describe('on linux x64', function () {
     beforeEach(function () {
-      osMock.platform = 'linux';
-      osMock.arch = 'x64';
+      osMock._platform = 'linux';
+      osMock._arch = 'x64';
     });
  
-    it('should download new jar if prompted that a new version exists, hence auto download doesnt work', function (done) {
+    it('should download new binary if binary is not present', function (done) {
       var browserStackTunnel = new bs.BrowserStackTunnel({
         key: 'MONKEY_KEY',
         hosts: [{
@@ -462,13 +507,41 @@ describe('BrowserStackTunnel', function () {
           port: PORT,
           sslFlag: SSL_FLAG
         }],
-        linux64File: LINUX_64_BINARY_FILE
+        linux64Bin: NEW_BINARY_DIR
       });
       browserStackTunnel.start(function (error) {
         if (error) {
           expect().fail(function () { return error; });
         }
-        expect(fstreamMock.fileName).to.equal(LINUX_64_BINARY_FILE);
+        expect(fsMock.fileNameModded).to.equal(NEW_BINARY_FILE);
+        expect(fsMock.mode).to.equal('0755');
+        expect(unzipMock.dirName).to.equal(NEW_BINARY_DIR);
+        expect(httpMock.url).to.equal(LINUX_64_BINARY_URL);
+        done();
+      });
+
+      setTimeout(function () {
+        process.emit('mock:child_process:stdout:data', 'monkey-----  Press Ctrl-C to exit ----monkey');
+      }, 100);
+    });
+
+    it('should download new binary if prompted that a new version exists as auto download is not compatible with our use of spawn', function (done) {
+      var browserStackTunnel = new bs.BrowserStackTunnel({
+        key: 'MONKEY_KEY',
+        hosts: [{
+          name: HOST_NAME,
+          port: PORT,
+          sslFlag: SSL_FLAG
+        }],
+        linux64Bin: LINUX_64_BINARY_DIR
+      });
+      browserStackTunnel.start(function (error) {
+        if (error) {
+          expect().fail(function () { return error; });
+        }
+        expect(fsMock.fileNameModded).to.equal(LINUX_64_BINARY_FILE);
+        expect(fsMock.mode).to.equal('0755');
+        expect(unzipMock.dirName).to.equal(LINUX_64_BINARY_DIR);
         expect(httpMock.url).to.equal(LINUX_64_BINARY_URL);
         done();
       });
@@ -479,7 +552,7 @@ describe('BrowserStackTunnel', function () {
       }, 100);
     });
 
-    it('should use the specified jar file', function (done) {
+    it('should use the specified bin directory', function (done) {
       spawnSpy.reset();
       var browserStackTunnel = new bs.BrowserStackTunnel({
         key: KEY,
@@ -489,7 +562,7 @@ describe('BrowserStackTunnel', function () {
           sslFlag: SSL_FLAG,
           tunnelIdentifier: 'my_tunnel'
         }],
-        linux64File: LINUX_64_BINARY_FILE
+        linux64Bin: LINUX_64_BINARY_DIR
       });
       browserStackTunnel.start(function (error) {
         if (error) {
@@ -513,11 +586,11 @@ describe('BrowserStackTunnel', function () {
 
   describe('on linux ia32', function () {
     beforeEach(function () {
-      osMock.platform = 'linux';
-      osMock.arch = 'ia32';
+      osMock._platform = 'linux';
+      osMock._arch = 'ia32';
     });
 
-    it('should download new jar if prompted that a new version exists, hence auto download doesnt work', function (done) {
+    it('should download new binary if binary is not present', function (done) {
       var browserStackTunnel = new bs.BrowserStackTunnel({
         key: 'MONKEY_KEY',
         hosts: [{
@@ -525,13 +598,41 @@ describe('BrowserStackTunnel', function () {
           port: PORT,
           sslFlag: SSL_FLAG
         }],
-        linux32File: LINUX_32_BINARY_FILE
+        linux32Bin: NEW_BINARY_DIR
       });
       browserStackTunnel.start(function (error) {
         if (error) {
           expect().fail(function () { return error; });
         }
-        expect(fstreamMock.fileName).to.equal(LINUX_32_BINARY_FILE);
+        expect(fsMock.fileNameModded).to.equal(NEW_BINARY_FILE);
+        expect(fsMock.mode).to.equal('0755');
+        expect(unzipMock.dirName).to.equal(NEW_BINARY_DIR);
+        expect(httpMock.url).to.equal(LINUX_32_BINARY_URL);
+        done();
+      });
+
+      setTimeout(function () {
+        process.emit('mock:child_process:stdout:data', 'monkey-----  Press Ctrl-C to exit ----monkey');
+      }, 100);
+    });
+
+    it('should download new binary if prompted that a new version exists as auto download is not compatible with our use of spawn', function (done) {
+      var browserStackTunnel = new bs.BrowserStackTunnel({
+        key: 'MONKEY_KEY',
+        hosts: [{
+          name: HOST_NAME,
+          port: PORT,
+          sslFlag: SSL_FLAG
+        }],
+        linux32Bin: LINUX_32_BINARY_DIR
+      });
+      browserStackTunnel.start(function (error) {
+        if (error) {
+          expect().fail(function () { return error; });
+        }
+        expect(fsMock.fileNameModded).to.equal(LINUX_32_BINARY_FILE);
+        expect(fsMock.mode).to.equal('0755');
+        expect(unzipMock.dirName).to.equal(LINUX_32_BINARY_DIR);
         expect(httpMock.url).to.equal(LINUX_32_BINARY_URL);
         done();
       });
@@ -542,7 +643,7 @@ describe('BrowserStackTunnel', function () {
       }, 100);
     });
 
-    it('should use the specified jar file', function (done) {
+    it('should use the specified bin directory', function (done) {
       spawnSpy.reset();
       var browserStackTunnel = new bs.BrowserStackTunnel({
         key: KEY,
@@ -552,7 +653,7 @@ describe('BrowserStackTunnel', function () {
           sslFlag: SSL_FLAG,
           tunnelIdentifier: 'my_tunnel'
         }],
-        linux32File: LINUX_32_BINARY_FILE
+        linux32Bin: LINUX_32_BINARY_DIR
       });
       browserStackTunnel.start(function (error) {
         if (error) {

@@ -70,13 +70,13 @@ var fileSystem = mocks.fs.create({
   bin: {
     'BrowserStackTunnel.jar': 1,
   	darwin: {
-      'BrowserStackTunnel': 1
+      'BrowserStackLocal': 1
   	},
   	linux32: {
-      'BrowserStackTunnel': 1
+      'BrowserStackLocal': 1
   	},
   	linux64: {
-      'BrowserStackTunnel': 1
+      'BrowserStackLocal': 1
   	}
   }
 });
@@ -91,32 +91,43 @@ fileSystem.createWriteStream = function (fileName) {
 	return new File();
 };
 
-var fstream = {};
-fstream.Writer = function (fileName) {
-	fstream.fileName = fileName;
-	return new File();
+fileSystem.createFileSync = function (fileName) {
+	fileSystem.fileNameCreated = fileName;
 };
 
-function Pipe() {
-	this.pipe = function (stream) {
-		this.on('finish', function () {
-			process.nextTick(function () {
-				stream.emit('finish');
-			});
-		});
-		return stream;
-	};
+fileSystem.chmod = function (fileName, mode, callback) {
+	fileSystem.fileNameModded = fileName;
+	fileSystem.mode = mode;
+	callback();
+};
+
+function Extract() {
+	this.on('finish', function() {
+		this.emit('close');
+	})
 }
-util.inherits(Pipe, EventEmitter);
+util.inherits(Extract, EventEmitter);
 
-var unzip = {};
-unzip.Parse = function () {
-	var pipe = new Pipe();
-	return pipe;
+var unzip = {
+	Extract: function (options) {
+		unzip.dirName = options.path;
+		return new Extract();
+	}
 };
+
+var os = {
+	_platform: 'unknown',
+	_arch: 'unknown',
+	platform: function () {
+		return this._platform;
+	},
+	arch: function () {
+		return this._arch;
+	}
+}
 
 exports.childProcessMock = childProcess;
 exports.httpMock = ServerRequest;
 exports.fsMock = fileSystem;
-exports.fstreamMock = fstream;
 exports.unzipMock = unzip;
+exports.osMock = os;
