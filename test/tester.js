@@ -2,15 +2,15 @@
   'use strict';
 
   var http = require('http'),
-    BrowserStackTunnel = require('./BrowserStackTunnel'),
-    config = {
-      hostname: 'localhost',
-      port: 9876
-    };
+      BrowserStackTunnel = require('../src/BrowserStackTunnel'),
+      config = {
+        hostname: 'localhost',
+        port: 9876
+      };
 
   var server = http.createServer(function (request, response) {
-      response.end('This is a test');
-    });
+    response.end('This is a test');
+  });
   server.listen(config.port);
 
   var tunnel = new BrowserStackTunnel({

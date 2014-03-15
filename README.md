@@ -1,10 +1,10 @@
 node-BrowserStackTunnel
-=========
+=======================
 
 [![Build Status](https://travis-ci.org/pghalliday/node-BrowserStackTunnel.png)](https://travis-ci.org/pghalliday/node-BrowserStackTunnel)
 [![Dependency Status](https://gemnasium.com/pghalliday/node-BrowserStackTunnel.png)](https://gemnasium.com/pghalliday/node-BrowserStackTunnel)
 
-A Node.js wrapper for the BrowserStack java tunnel client
+A Node.js wrapper for the BrowserStack tunnel client. On first run this will download the appropriate binary for your platform from BrowserStack. On Windows this will be a Jar file and you will need to have Java already installed.
 
 http://www.browserstack.com/
 
@@ -26,7 +26,10 @@ var browserStackTunnel = new BrowserStackTunnel({
     port: 8080,
     sslFlag: 0
   }],
-  jarFile: 'your_jar_file', // optionally override the included BrowserStackTunnel.jar file
+  osxBin: 'your_bin_dir', // optionally override the default bin directory for the OSX binary
+  linux32Bin: 'your_bin_dir', // optionally override the default bin directory for the Linux 32 bit binary
+  linux64Bin: 'your_bin_dir', // optionally override the default bin directory for the Linux 64 bit binary
+  jarFile: 'your_jar_file', // on other platforms, optionally override the default path to the BrowserStackTunnel.jar file
   tunnelIdentifier: 'my_tunnel', // optionally set the -tunnelIdentifier option
   skipCheck: true // optionally set the -skipCheck option
 });
@@ -57,5 +60,7 @@ browserStackTunnel.start(function(error) {
 In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using `npm test`.
 
 ## License
-Copyright (c) 2012 Peter Halliday  
+Copyright &copy; 2014 Peter Halliday  
 Licensed under the MIT license.
+
+[![Donate Bitcoins](https://coinbase.com/assets/buttons/donation_large-6ec72b1a9eec516944e50a22aca7db35.png)](https://coinbase.com/checkouts/9d121c0321590556b32241bbe7960362)

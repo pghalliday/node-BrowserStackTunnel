@@ -3,3 +3,5 @@ node_modules
 BrowserStackConfig.js
 .vagrant
 Berksfile.lock
+Vagrantfile
+/bin/

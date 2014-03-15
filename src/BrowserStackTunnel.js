@@ -1,19 +1,37 @@
 var util = require('util'),
-  http = require('http'),
-  fs = require('fs'),
-  EventEmitter = require('events').EventEmitter,
-  spawn = require('child_process').spawn;
+    fs = require('fs'),
+    EventEmitter = require('events').EventEmitter,
+    spawn = require('child_process').spawn,
+    os = require('os'),
+    JarBinary = require('./JarBinary'),
+    ZipBinary = require('./ZipBinary');
 
 function BrowserStackTunnel(options) {
   'use strict';
-  var params = [],
-    currentDir = __dirname ? __dirname + '/..' : '.',
-    defaultJarPath = util.format('%s/bin/BrowserStackTunnel.jar', currentDir);
+  var params = [];
+
+  var binary;
+  switch (os.platform()) {
+  case 'linux':
+    switch (os.arch()) {
+    case 'x64':
+      binary = new ZipBinary('linux', 'x64', options.linux64Bin);
+      break;
+    case 'ia32':
+      binary = new ZipBinary('linux', 'ia32', options.linux32Bin);
+      break;
+    }
+    break;
+  case 'darwin':
+    binary = new ZipBinary('darwin', 'x64', options.osxBin);
+    break;
+  default:
+    binary = new JarBinary(options.jarFile);
+    break;
+  }
 
   this.stdoutData = '';
   this.tunnel = null;
-    
-  options.jarFile = options.jarFile || defaultJarPath;
 
   var hosts = '';
   options.hosts.forEach(function (host) {
@@ -37,26 +55,16 @@ function BrowserStackTunnel(options) {
     'already_running': new RegExp('\\*\\*Error: There is another JAR already running'),
     'invalid_key': new RegExp('\\*\\*Error: You provided an invalid key'),
     'connection_failure': new RegExp('\\*\\*Error: Could not connect to server'),
-    'newer_avalible': new RegExp('There is a new version of BrowserStackTunnel.jar available on server'),
+    'newer_available': new RegExp('There is a new version of BrowserStackTunnel.jar available on server'),
     'started': new RegExp('Press Ctrl-C to exit')
   };
 
-  this.on('newer_avalible', function () {
+  this.on('newer_available', function () {
+    console.log('BrowserStackTunnel: binary out of date');
     this.killTunnel();
-
-    var self = this,
-      new_browserstack_lib = fs.createWriteStream(options.jarFile);
-
-    http.get('http://www.browserstack.com/BrowserStackTunnel.jar', function (response) {
-      console.log('Downloading newer version...');
-      
-      new_browserstack_lib.on('finish', function () {
-        console.log('Downloading... Done');
-        new_browserstack_lib.close();
-        self.startTunnel();
-      });
-
-      response.pipe(new_browserstack_lib);
+    var self = this;
+    binary.update(function () {
+      self.startTunnel();
     });
   });
 
@@ -75,7 +83,6 @@ function BrowserStackTunnel(options) {
   this.updateState = function (data) {
     var state;
     this.stdoutData += data.toString();
-
     for (state in this.stateMatchers) {
       if (this.stateMatchers.hasOwnProperty(state) && this.stateMatchers[state].test(this.stdoutData) && this.state !== state) {
         this.state = state;
@@ -96,9 +103,9 @@ function BrowserStackTunnel(options) {
   };
 
   this.exit = function () {
-    if (this.state !== 'started' && this.state !== 'newer_avalible') {
+    if (this.state !== 'started' && this.state !== 'newer_available') {
       this.emit('started', new Error('child failed to start:\n' + this.stdoutData));
-    } else if (this.state !== 'newer_avalible') {
+    } else if (this.state !== 'newer_available') {
       this.state = 'stop';
       this.emit('stop');
     }
@@ -109,20 +116,27 @@ function BrowserStackTunnel(options) {
     process.removeListener('uncaughtException', this.exit.bind(this));
   };
 
-  this.startTunnel = function () {
-    if (!fs.existsSync(options.jarFile)) {
-      this.exit();
-      return;
-    }
-
+  this._startTunnel = function () {
     this.cleanUp();
-    this.tunnel = spawn('java', ['-jar', options.jarFile, options.key].concat(params));
+    this.tunnel = spawn(binary.command, binary.args.concat([options.key]).concat(params));
     this.tunnel.stdout.on('data', this.updateState.bind(this));
     this.tunnel.stderr.on('data', this.updateState.bind(this));
     this.tunnel.on('error', this.killTunnel.bind(this));
     this.tunnel.on('exit', this.exit.bind(this));
 
     process.on('uncaughtException', this.killTunnel.bind(this));
+  };
+
+  this.startTunnel = function () {
+    if (!fs.existsSync(binary.path)) {
+      console.log('BrowserStackTunnel: binary not present');
+      var self = this;
+      binary.update(function () {
+        self._startTunnel();
+      });
+    } else {
+      this._startTunnel();
+    }
   };
 
   this.start = function (callback) {

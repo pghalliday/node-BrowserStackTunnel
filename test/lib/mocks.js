@@ -50,7 +50,10 @@ var childProcess = {
 var ServerResponse = function () {
 	var response = new mocks.http.ServerResponse();
 	response.pipe = function (stream) {
-		stream.emit('finish');
+		process.nextTick(function () {
+			stream.emit('finish');
+		});
+		return stream;
 	}
 
 	return response;
@@ -58,32 +61,73 @@ var ServerResponse = function () {
 
 var ServerRequest = {
 	get: function(url, callback) {
+		ServerRequest.url = url;
 		callback(ServerResponse());
 	}
 };
 
-var fileSystem = {
-	create: function () {
-		function File(fileName) {
-			this.fileName = fileName;
-			this.close = function () {};
-		}
+var fileSystem = mocks.fs.create({
+  bin: {
+    'BrowserStackTunnel.jar': 1,
+  	darwin: {
+      'BrowserStackLocal': 1
+  	},
+  	linux32: {
+      'BrowserStackLocal': 1
+  	},
+  	linux64: {
+      'BrowserStackLocal': 1
+  	}
+  }
+});
 
-		var fs = mocks.fs.create({
-	      bin: {
-	        'BrowserStackTunnel.jar': 1
-	      }
-	    });
+function File() {
+	this.close = function () {};
+}
+util.inherits(File, EventEmitter);
 
-		util.inherits(File, EventEmitter);
-	    fs.createWriteStream = function(fileName){
-	    	return new File();
-	    };	
-
-	    return fs;
-	}	
+fileSystem.createWriteStream = function (fileName) {
+	fileSystem.fileName = fileName;
+	return new File();
 };
+
+fileSystem.createFileSync = function (fileName) {
+	fileSystem.fileNameCreated = fileName;
+};
+
+fileSystem.chmod = function (fileName, mode, callback) {
+	fileSystem.fileNameModded = fileName;
+	fileSystem.mode = mode;
+	callback();
+};
+
+function Extract() {
+	this.on('finish', function() {
+		this.emit('close');
+	})
+}
+util.inherits(Extract, EventEmitter);
+
+var unzip = {
+	Extract: function (options) {
+		unzip.dirName = options.path;
+		return new Extract();
+	}
+};
+
+var os = {
+	_platform: 'unknown',
+	_arch: 'unknown',
+	platform: function () {
+		return this._platform;
+	},
+	arch: function () {
+		return this._arch;
+	}
+}
 
 exports.childProcessMock = childProcess;
 exports.httpMock = ServerRequest;
 exports.fsMock = fileSystem;
+exports.unzipMock = unzip;
+exports.osMock = os;
