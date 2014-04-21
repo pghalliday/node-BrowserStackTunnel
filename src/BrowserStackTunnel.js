@@ -50,6 +50,26 @@ function BrowserStackTunnel(options) {
     params.push('-skipCheck');
   }
 
+  if (options.v) {
+    params.push('-v');
+  }
+
+  if (options.proxyHost) {
+    params.push('-proxyHost', options.proxyHost);
+  }
+
+  if (options.proxyPort) {
+    params.push('-proxyPort', options.proxyPort);
+  }
+
+  if (options.proxyUser) {
+    params.push('-proxyUser', options.proxyUser);
+  }
+
+  if (options.proxyPass) {
+    params.push('-proxyPass', options.proxyPass);
+  }
+
   this.state = 'stop';
   this.stateMatchers = {
     'already_running': new RegExp('\\*\\*Error: There is another JAR already running'),

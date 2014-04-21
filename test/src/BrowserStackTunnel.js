@@ -53,7 +53,11 @@ var NEW_BINARY_DIR = '/bin/new',
     KEY = 'This is a fake key',
     HOST_NAME2 = 'localhost2',
     PORT2 = 8081,
-    SSL_FLAG2 = 1;
+    SSL_FLAG2 = 1,
+    PROXY_HOST = 'fakehost.com',
+    PROXY_USER = 'proxyuser',
+    PROXY_PASS = 'proxypass',
+    PROXY_PORT = '1234';
 
 describe('BrowserStackTunnel', function () {
   'use strict';
@@ -302,6 +306,118 @@ describe('BrowserStackTunnel', function () {
             KEY,
             HOST_NAME + ',' + PORT + ',' + SSL_FLAG,
             '-skipCheck'
+          ]
+        );
+        done();
+      }
+    });
+
+    process.emit('mock:child_process:stdout:data', 'monkey-----  Press Ctrl-C to exit ----monkey');
+  });
+
+  it('should support the v (verbose) option', function (done) {
+    spawnSpy.reset();
+    var browserStackTunnel = new bs.BrowserStackTunnel({
+      key: KEY,
+      hosts: [{
+        name: HOST_NAME,
+        port: PORT,
+        sslFlag: SSL_FLAG
+      }],
+      v: true,
+      jarFile: JAR_FILE
+    });
+    browserStackTunnel.start(function (error) {
+      if (error) {
+        expect().fail(function () { return error; });
+      } else if (browserStackTunnel.state === 'started') {
+        sinon.assert.calledOnce(spawnSpy);
+        sinon.assert.calledWithExactly(
+          spawnSpy,
+          'java', [
+            '-jar',
+            JAR_FILE,
+            KEY,
+            HOST_NAME + ',' + PORT + ',' + SSL_FLAG,
+            '-v'
+          ]
+        );
+        done();
+      }
+    });
+
+    process.emit('mock:child_process:stdout:data', 'monkey-----  Press Ctrl-C to exit ----monkey');
+  });
+
+  it('should support the skipCheck option', function (done) {
+    spawnSpy.reset();
+    var browserStackTunnel = new bs.BrowserStackTunnel({
+      key: KEY,
+      hosts: [{
+        name: HOST_NAME,
+        port: PORT,
+        sslFlag: SSL_FLAG
+      }],
+      skipCheck: true,
+      jarFile: JAR_FILE
+    });
+    browserStackTunnel.start(function (error) {
+      if (error) {
+        expect().fail(function () { return error; });
+      } else if (browserStackTunnel.state === 'started') {
+        sinon.assert.calledOnce(spawnSpy);
+        sinon.assert.calledWithExactly(
+          spawnSpy,
+          'java', [
+            '-jar',
+            JAR_FILE,
+            KEY,
+            HOST_NAME + ',' + PORT + ',' + SSL_FLAG,
+            '-skipCheck'
+          ]
+        );
+        done();
+      }
+    });
+
+    process.emit('mock:child_process:stdout:data', 'monkey-----  Press Ctrl-C to exit ----monkey');
+  });
+
+  it('should support the proxy options', function (done) {
+    spawnSpy.reset();
+    var browserStackTunnel = new bs.BrowserStackTunnel({
+      key: KEY,
+      hosts: [{
+        name: HOST_NAME,
+        port: PORT,
+        sslFlag: SSL_FLAG
+      }],
+      proxyUser: PROXY_USER,
+      proxyPass: PROXY_PASS,
+      proxyPort: PROXY_PORT,
+      proxyHost: PROXY_HOST,
+      jarFile: JAR_FILE
+    });
+    browserStackTunnel.start(function (error) {
+      if (error) {
+        expect().fail(function () { return error; });
+      } else if (browserStackTunnel.state === 'started') {
+        sinon.assert.calledOnce(spawnSpy);
+        sinon.assert.calledWithExactly(
+          spawnSpy,
+          'java', [
+            '-jar',
+            JAR_FILE,
+            KEY,
+            HOST_NAME + ',' + PORT + ',' + SSL_FLAG,
+            '-proxyHost',
+            PROXY_HOST,
+            '-proxyPort',
+            PROXY_PORT,
+            '-proxyUser',
+            PROXY_USER,
+            '-proxyPass',
+            PROXY_PASS
           ]
         );
         done();
