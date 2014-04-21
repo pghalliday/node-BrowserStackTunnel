@@ -31,7 +31,12 @@ var browserStackTunnel = new BrowserStackTunnel({
   linux64Bin: 'your_bin_dir', // optionally override the default bin directory for the Linux 64 bit binary
   jarFile: 'your_jar_file', // on other platforms, optionally override the default path to the BrowserStackTunnel.jar file
   tunnelIdentifier: 'my_tunnel', // optionally set the -tunnelIdentifier option
-  skipCheck: true // optionally set the -skipCheck option
+  skipCheck: true, // optionally set the -skipCheck option
+  v: true, // optionally set the -v (verbose) option
+  proxyUser: PROXY_USER, // optionally set the -proxyUser option
+  proxyPass: PROXY_PASS, // optionally set the -proxyPass option
+  proxyPort: PROXY_PORT, // optionally set the -proxyPort option
+  proxyHost: PROXY_HOST // optionally set the -proxyHost option
 });
 
 browserStackTunnel.start(function(error) {
