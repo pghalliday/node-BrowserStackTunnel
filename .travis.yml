@@ -3,6 +3,6 @@
    - "0.11"
    - "0.10"
    - "0.8"
-install:
-  - npm update npm -g
-  - npm install
+ install:
+   - npm update npm -g
+   - npm install
