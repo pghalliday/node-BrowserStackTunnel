@@ -45,7 +45,6 @@
     "child_process"
   ],
   "dependencies": {
-    "unzip": "~0.1.9",
-    "fs-extra": "~0.8.1"
+    "unzip": "~0.1.9"
   }
 }

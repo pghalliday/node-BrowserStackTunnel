@@ -3,7 +3,6 @@ var util = require('util'),
     EventEmitter = require('events').EventEmitter,
     spawn = require('child_process').spawn,
     os = require('os'),
-    JarBinary = require('./JarBinary'),
     ZipBinary = require('./ZipBinary');
 
 function BrowserStackTunnel(options) {
@@ -26,7 +25,7 @@ function BrowserStackTunnel(options) {
     binary = new ZipBinary('darwin', 'x64', options.osxBin);
     break;
   default:
-    binary = new JarBinary(options.jarFile);
+    binary = new ZipBinary('win32', null, options.win32Bin, 'exe');
     break;
   }
 

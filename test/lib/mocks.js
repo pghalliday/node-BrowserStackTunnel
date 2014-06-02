@@ -68,7 +68,6 @@ var ServerRequest = {
 
 var fileSystem = mocks.fs.create({
   bin: {
-    'BrowserStackTunnel.jar': 1,
   	darwin: {
       'BrowserStackLocal': 1
   	},
@@ -76,6 +75,9 @@ var fileSystem = mocks.fs.create({
       'BrowserStackLocal': 1
   	},
   	linux64: {
+      'BrowserStackLocal': 1
+  	},
+  	win32: {
       'BrowserStackLocal': 1
   	}
   }

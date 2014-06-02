@@ -29,7 +29,7 @@ var browserStackTunnel = new BrowserStackTunnel({
   osxBin: 'your_bin_dir', // optionally override the default bin directory for the OSX binary
   linux32Bin: 'your_bin_dir', // optionally override the default bin directory for the Linux 32 bit binary
   linux64Bin: 'your_bin_dir', // optionally override the default bin directory for the Linux 64 bit binary
-  jarFile: 'your_jar_file', // on other platforms, optionally override the default path to the BrowserStackTunnel.jar file
+  win32Bin: 'your_bin_dir', // optionally override the default bin directory for the win32 binary
   tunnelIdentifier: 'my_tunnel', // optionally set the -tunnelIdentifier option
   skipCheck: true, // optionally set the -skipCheck option
   v: true, // optionally set the -v (verbose) option
