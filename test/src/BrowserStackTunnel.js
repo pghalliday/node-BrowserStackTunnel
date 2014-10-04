@@ -390,6 +390,40 @@ describe('BrowserStackTunnel', function () {
     }, 100);
   });
 
+  it('should support the force option', function (done) {
+    spawnSpy.reset();
+    var browserStackTunnel = new bs.BrowserStackTunnel({
+      key: KEY,
+      hosts: [{
+        name: HOST_NAME,
+        port: PORT,
+        sslFlag: SSL_FLAG
+      }],
+      force: true,
+      win32Bin: WIN32_BINARY_DIR
+    });
+    browserStackTunnel.start(function (error) {
+      if (error) {
+        expect().fail(function () { return error; });
+      } else if (browserStackTunnel.state === 'started') {
+        sinon.assert.calledOnce(spawnSpy);
+        sinon.assert.calledWithExactly(
+          spawnSpy,
+          WIN32_BINARY_FILE, [
+            KEY,
+            HOST_NAME + ',' + PORT + ',' + SSL_FLAG,
+            '-force'
+          ]
+        );
+        done();
+      }
+    });
+
+    setTimeout(function () {
+      process.emit('mock:child_process:stdout:data', 'monkey-----  Press Ctrl-C to exit ----monkey');
+    }, 100);
+  });
+
   it('should support the skipCheck option', function (done) {
     spawnSpy.reset();
     var browserStackTunnel = new bs.BrowserStackTunnel({

@@ -36,7 +36,8 @@ var browserStackTunnel = new BrowserStackTunnel({
   proxyUser: PROXY_USER, // optionally set the -proxyUser option
   proxyPass: PROXY_PASS, // optionally set the -proxyPass option
   proxyPort: PROXY_PORT, // optionally set the -proxyPort option
-  proxyHost: PROXY_HOST // optionally set the -proxyHost option
+  proxyHost: PROXY_HOST, // optionally set the -proxyHost option
+  force: false // optionally set the -force option
 });
 
 browserStackTunnel.start(function(error) {

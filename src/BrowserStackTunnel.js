@@ -53,6 +53,10 @@ function BrowserStackTunnel(options) {
     params.push('-v');
   }
 
+  if (options.force) {
+    params.push('-force');
+  }
+
   if (options.proxyHost) {
     params.push('-proxyHost', options.proxyHost);
   }
