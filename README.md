@@ -25,19 +25,20 @@ var browserStackTunnel = new BrowserStackTunnel({
     name: 'localhost',
     port: 8080,
     sslFlag: 0
-  }],
+  }], // optionally set hosts
   osxBin: 'your_bin_dir', // optionally override the default bin directory for the OSX binary
   linux32Bin: 'your_bin_dir', // optionally override the default bin directory for the Linux 32 bit binary
   linux64Bin: 'your_bin_dir', // optionally override the default bin directory for the Linux 64 bit binary
   win32Bin: 'your_bin_dir', // optionally override the default bin directory for the win32 binary
-  tunnelIdentifier: 'my_tunnel', // optionally set the -tunnelIdentifier option
-  skipCheck: true, // optionally set the -skipCheck option
+  localIdentifier: 'my_tunnel', // optionally set the -localIdentifier option
   v: true, // optionally set the -v (verbose) option
   proxyUser: PROXY_USER, // optionally set the -proxyUser option
   proxyPass: PROXY_PASS, // optionally set the -proxyPass option
   proxyPort: PROXY_PORT, // optionally set the -proxyPort option
   proxyHost: PROXY_HOST, // optionally set the -proxyHost option
-  force: false // optionally set the -force option
+  force: false, // optionally set the -force option
+  forcelocal: false, // optionally set the -forcelocal option
+  onlyAutomate: false, // optionally set the -onlyAutomate option
 });
 
 browserStackTunnel.start(function(error) {

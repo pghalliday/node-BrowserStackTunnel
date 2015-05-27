@@ -254,6 +254,32 @@ describe('BrowserStackTunnel', function () {
     }, 100);
   });
 
+  it('should support no hosts', function (done) {
+    spawnSpy.reset();
+    var browserStackTunnel = new bs.BrowserStackTunnel({
+      key: KEY,
+      win32Bin: WIN32_BINARY_DIR
+    });
+    browserStackTunnel.start(function (error) {
+      if (error) {
+        expect().fail(function () { return error; });
+      } else if (browserStackTunnel.state === 'started') {
+        sinon.assert.calledOnce(spawnSpy);
+        sinon.assert.calledWithExactly(
+          spawnSpy,
+          WIN32_BINARY_FILE, [
+            KEY,
+          ]
+        );
+        done();
+      }
+    });
+
+    setTimeout(function () {
+      process.emit('mock:child_process:stdout:data', 'monkey-----  Press Ctrl-C to exit ----monkey');
+    }, 100);
+  });
+
   it('should use the specified binary directory', function (done) {
     spawnSpy.reset();
     var browserStackTunnel = new bs.BrowserStackTunnel({
@@ -262,7 +288,7 @@ describe('BrowserStackTunnel', function () {
         name: HOST_NAME,
         port: PORT,
         sslFlag: SSL_FLAG,
-        tunnelIdentifier: 'my_tunnel'
+        localIdentifier: 'my_tunnel'
       }],
       win32Bin: WIN32_BINARY_DIR
     });
@@ -287,7 +313,7 @@ describe('BrowserStackTunnel', function () {
     }, 100);
   });
 
-  it('should support the tunnelIdentifier option', function (done) {
+  it('should support the localIdentifier option', function (done) {
     spawnSpy.reset();
     var browserStackTunnel = new bs.BrowserStackTunnel({
       key: KEY,
@@ -296,7 +322,7 @@ describe('BrowserStackTunnel', function () {
         port: PORT,
         sslFlag: SSL_FLAG
       }],
-      tunnelIdentifier: 'my_tunnel',
+      localIdentifier: 'my_tunnel',
       win32Bin: WIN32_BINARY_DIR
     });
     browserStackTunnel.start(function (error) {
@@ -309,42 +335,8 @@ describe('BrowserStackTunnel', function () {
           WIN32_BINARY_FILE, [
             KEY,
             HOST_NAME + ',' + PORT + ',' + SSL_FLAG,
-            '-tunnelIdentifier',
+            '-localIdentifier',
             'my_tunnel'
-          ]
-        );
-        done();
-      }
-    });
-
-    setTimeout(function () {
-      process.emit('mock:child_process:stdout:data', 'monkey-----  Press Ctrl-C to exit ----monkey');
-    }, 100);
-  });
-
-  it('should support the skipCheck option', function (done) {
-    spawnSpy.reset();
-    var browserStackTunnel = new bs.BrowserStackTunnel({
-      key: KEY,
-      hosts: [{
-        name: HOST_NAME,
-        port: PORT,
-        sslFlag: SSL_FLAG
-      }],
-      skipCheck: true,
-      win32Bin: WIN32_BINARY_DIR
-    });
-    browserStackTunnel.start(function (error) {
-      if (error) {
-        expect().fail(function () { return error; });
-      } else if (browserStackTunnel.state === 'started') {
-        sinon.assert.calledOnce(spawnSpy);
-        sinon.assert.calledWithExactly(
-          spawnSpy,
-          WIN32_BINARY_FILE, [
-            KEY,
-            HOST_NAME + ',' + PORT + ',' + SSL_FLAG,
-            '-skipCheck'
           ]
         );
         done();
@@ -424,7 +416,7 @@ describe('BrowserStackTunnel', function () {
     }, 100);
   });
 
-  it('should support the skipCheck option', function (done) {
+  it('should support the forcelocal option', function (done) {
     spawnSpy.reset();
     var browserStackTunnel = new bs.BrowserStackTunnel({
       key: KEY,
@@ -433,7 +425,7 @@ describe('BrowserStackTunnel', function () {
         port: PORT,
         sslFlag: SSL_FLAG
       }],
-      skipCheck: true,
+      forcelocal: true,
       win32Bin: WIN32_BINARY_DIR
     });
     browserStackTunnel.start(function (error) {
@@ -446,7 +438,41 @@ describe('BrowserStackTunnel', function () {
           WIN32_BINARY_FILE, [
             KEY,
             HOST_NAME + ',' + PORT + ',' + SSL_FLAG,
-            '-skipCheck'
+            '-forcelocal'
+          ]
+        );
+        done();
+      }
+    });
+
+    setTimeout(function () {
+      process.emit('mock:child_process:stdout:data', 'monkey-----  Press Ctrl-C to exit ----monkey');
+    }, 100);
+  });
+
+  it('should support the onlyAutomate option', function (done) {
+    spawnSpy.reset();
+    var browserStackTunnel = new bs.BrowserStackTunnel({
+      key: KEY,
+      hosts: [{
+        name: HOST_NAME,
+        port: PORT,
+        sslFlag: SSL_FLAG
+      }],
+      onlyAutomate: true,
+      win32Bin: WIN32_BINARY_DIR
+    });
+    browserStackTunnel.start(function (error) {
+      if (error) {
+        expect().fail(function () { return error; });
+      } else if (browserStackTunnel.state === 'started') {
+        sinon.assert.calledOnce(spawnSpy);
+        sinon.assert.calledWithExactly(
+          spawnSpy,
+          WIN32_BINARY_FILE, [
+            KEY,
+            HOST_NAME + ',' + PORT + ',' + SSL_FLAG,
+            '-onlyAutomate'
           ]
         );
         done();
@@ -571,7 +597,7 @@ describe('BrowserStackTunnel', function () {
           name: HOST_NAME,
           port: PORT,
           sslFlag: SSL_FLAG,
-          tunnelIdentifier: 'my_tunnel'
+          localIdentifier: 'my_tunnel'
         }],
         win32Bin: WIN32_BINARY_DIR
       });
@@ -666,7 +692,7 @@ describe('BrowserStackTunnel', function () {
           name: HOST_NAME,
           port: PORT,
           sslFlag: SSL_FLAG,
-          tunnelIdentifier: 'my_tunnel'
+          localIdentifier: 'my_tunnel'
         }],
         osxBin: OSX_BINARY_DIR
       });
@@ -761,7 +787,7 @@ describe('BrowserStackTunnel', function () {
           name: HOST_NAME,
           port: PORT,
           sslFlag: SSL_FLAG,
-          tunnelIdentifier: 'my_tunnel'
+          localIdentifier: 'my_tunnel'
         }],
         linux64Bin: LINUX_64_BINARY_DIR
       });
@@ -856,7 +882,7 @@ describe('BrowserStackTunnel', function () {
           name: HOST_NAME,
           port: PORT,
           sslFlag: SSL_FLAG,
-          tunnelIdentifier: 'my_tunnel'
+          localIdentifier: 'my_tunnel'
         }],
         linux32Bin: LINUX_32_BINARY_DIR
       });

@@ -32,21 +32,19 @@ function BrowserStackTunnel(options) {
   this.stdoutData = '';
   this.tunnel = null;
 
-  var hosts = '';
-  options.hosts.forEach(function (host) {
-    if (hosts.length > 0) {
-      hosts += ',';
-    }
-    hosts += host.name + ',' + host.port + ',' + host.sslFlag;
-  });
-  params.push(hosts);
-
-  if (options.tunnelIdentifier) {
-    params.push('-tunnelIdentifier', options.tunnelIdentifier);
+  if (options.hosts) {
+    var hosts = '';
+    options.hosts.forEach(function (host) {
+      if (hosts.length > 0) {
+        hosts += ',';
+      }
+      hosts += host.name + ',' + host.port + ',' + host.sslFlag;
+    });
+    params.push(hosts);
   }
 
-  if (options.skipCheck) {
-    params.push('-skipCheck');
+  if (options.localIdentifier) {
+    params.push('-localIdentifier', options.localIdentifier);
   }
 
   if (options.v) {
@@ -55,6 +53,14 @@ function BrowserStackTunnel(options) {
 
   if (options.force) {
     params.push('-force');
+  }
+
+  if (options.forcelocal) {
+    params.push('-forcelocal');
+  }
+
+  if (options.onlyAutomate) {
+    params.push('-onlyAutomate');
   }
 
   if (options.proxyHost) {
