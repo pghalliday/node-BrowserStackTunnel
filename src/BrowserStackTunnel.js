@@ -178,7 +178,8 @@ function BrowserStackTunnel(options) {
   };
 
   this.stop = function (callback) {
-    if (this.state !== 'stop' && this.listenerCount('stop') === 0) {
+    var listenerCount = (typeof this.listenerCount !== 'undefined') ? this.listenerCount('stop') : EventEmitter.listenerCount(this, 'stop');
+    if (this.state !== 'stop' && listenerCount === 0) {
       this.once('stop', callback);
     } else if (this.state !== 'started') {
       var err = new Error('child not started');
