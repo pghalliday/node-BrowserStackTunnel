@@ -66,7 +66,7 @@ describe('BrowserStackTunnel', function () {
     osMock._platform = 'unknown';
     osMock._arch = 'unknown';
   });
-    
+
   it('should error if stopped before started', function (done) {
     var browserStackTunnel = new bs.BrowserStackTunnel({
       key: KEY,
@@ -82,7 +82,7 @@ describe('BrowserStackTunnel', function () {
       done();
     });
   });
-  
+
   it('should error if no server listening on the specified host and port', function (done) {
     var browserStackTunnel = new bs.BrowserStackTunnel({
       key: KEY,
@@ -122,7 +122,7 @@ describe('BrowserStackTunnel', function () {
       process.emit('mock:child_process:stdout:data', 'monkey-----  **Error: You provided an invalid key ----monkey');
     }, 100);
   });
-  
+
   it('should error if started when already running', function (done) {
     var browserStackTunnel = new bs.BrowserStackTunnel({
       key: KEY,
@@ -148,7 +148,7 @@ describe('BrowserStackTunnel', function () {
       process.emit('mock:child_process:stdout:data', 'monkey-----  Press Ctrl-C to exit ----monkey');
     }, 100);
   });
-  
+
   it('should error if started when another instance is already running', function (done) {
     var browserStackTunnel1 = new bs.BrowserStackTunnel({
       key: KEY,
@@ -242,6 +242,7 @@ describe('BrowserStackTunnel', function () {
           spawnSpy,
           WIN32_BINARY_FILE, [
             KEY,
+            '--only',
             HOST_NAME + ',' + PORT + ',' + SSL_FLAG + ',' + HOST_NAME2 + ',' + PORT2 + ',' + SSL_FLAG2
           ]
         );
@@ -301,6 +302,7 @@ describe('BrowserStackTunnel', function () {
           spawnSpy,
           WIN32_BINARY_FILE, [
             KEY,
+            '--only',
             HOST_NAME + ',' + PORT + ',' + SSL_FLAG
           ]
         );
@@ -334,8 +336,9 @@ describe('BrowserStackTunnel', function () {
           spawnSpy,
           WIN32_BINARY_FILE, [
             KEY,
+            '--only',
             HOST_NAME + ',' + PORT + ',' + SSL_FLAG,
-            '-localIdentifier',
+            '--local-identifier',
             'my_tunnel'
           ]
         );
@@ -369,8 +372,9 @@ describe('BrowserStackTunnel', function () {
           spawnSpy,
           WIN32_BINARY_FILE, [
             KEY,
+            '--only',
             HOST_NAME + ',' + PORT + ',' + SSL_FLAG,
-            '-v'
+            '--verbose'
           ]
         );
         done();
@@ -403,8 +407,9 @@ describe('BrowserStackTunnel', function () {
           spawnSpy,
           WIN32_BINARY_FILE, [
             KEY,
+            '--only',
             HOST_NAME + ',' + PORT + ',' + SSL_FLAG,
-            '-force'
+            '--force'
           ]
         );
         done();
@@ -437,8 +442,9 @@ describe('BrowserStackTunnel', function () {
           spawnSpy,
           WIN32_BINARY_FILE, [
             KEY,
+            '--only',
             HOST_NAME + ',' + PORT + ',' + SSL_FLAG,
-            '-forcelocal'
+            '--force-local'
           ]
         );
         done();
@@ -471,8 +477,9 @@ describe('BrowserStackTunnel', function () {
           spawnSpy,
           WIN32_BINARY_FILE, [
             KEY,
+            '--only',
             HOST_NAME + ',' + PORT + ',' + SSL_FLAG,
-            '-onlyAutomate'
+            '--only-automate'
           ]
         );
         done();
@@ -508,14 +515,15 @@ describe('BrowserStackTunnel', function () {
           spawnSpy,
           WIN32_BINARY_FILE, [
             KEY,
+            '--only',
             HOST_NAME + ',' + PORT + ',' + SSL_FLAG,
-            '-proxyHost',
+            '--proxy-host',
             PROXY_HOST,
-            '-proxyPort',
+            '--proxy-port',
             PROXY_PORT,
-            '-proxyUser',
+            '--proxy-user',
             PROXY_USER,
-            '-proxyPass',
+            '--proxy-pass',
             PROXY_PASS
           ]
         );
@@ -610,6 +618,7 @@ describe('BrowserStackTunnel', function () {
             spawnSpy,
             WIN32_BINARY_FILE, [
               KEY,
+              '--only',
               HOST_NAME + ',' + PORT + ',' + SSL_FLAG
             ]
           );
@@ -705,6 +714,7 @@ describe('BrowserStackTunnel', function () {
             spawnSpy,
             OSX_BINARY_FILE, [
               KEY,
+              '--only',
               HOST_NAME + ',' + PORT + ',' + SSL_FLAG
             ]
           );
@@ -723,7 +733,7 @@ describe('BrowserStackTunnel', function () {
       osMock._platform = 'linux';
       osMock._arch = 'x64';
     });
- 
+
     it('should download new binary if binary is not present', function (done) {
       var browserStackTunnel = new bs.BrowserStackTunnel({
         key: 'MONKEY_KEY',
@@ -800,6 +810,7 @@ describe('BrowserStackTunnel', function () {
             spawnSpy,
             LINUX_64_BINARY_FILE, [
               KEY,
+              '--only',
               HOST_NAME + ',' + PORT + ',' + SSL_FLAG
             ]
           );
@@ -895,6 +906,7 @@ describe('BrowserStackTunnel', function () {
             spawnSpy,
             LINUX_32_BINARY_FILE, [
               KEY,
+              '--only',
               HOST_NAME + ',' + PORT + ',' + SSL_FLAG
             ]
           );

@@ -40,43 +40,43 @@ function BrowserStackTunnel(options) {
       }
       hosts += host.name + ',' + host.port + ',' + host.sslFlag;
     });
-    params.push(hosts);
+    params.push('--only', hosts);
   }
 
   if (options.localIdentifier) {
-    params.push('-localIdentifier', options.localIdentifier);
+    params.push('--local-identifier', options.localIdentifier);
   }
 
   if (options.v) {
-    params.push('-v');
+    params.push('--verbose');
   }
 
   if (options.force) {
-    params.push('-force');
+    params.push('--force');
   }
 
   if (options.forcelocal) {
-    params.push('-forcelocal');
+    params.push('--force-local');
   }
 
   if (options.onlyAutomate) {
-    params.push('-onlyAutomate');
+    params.push('--only-automate');
   }
 
   if (options.proxyHost) {
-    params.push('-proxyHost', options.proxyHost);
+    params.push('--proxy-host', options.proxyHost);
   }
 
   if (options.proxyPort) {
-    params.push('-proxyPort', options.proxyPort);
+    params.push('--proxy-port', options.proxyPort);
   }
 
   if (options.proxyUser) {
-    params.push('-proxyUser', options.proxyUser);
+    params.push('--proxy-user', options.proxyUser);
   }
 
   if (options.proxyPass) {
-    params.push('-proxyPass', options.proxyPass);
+    params.push('--proxy-pass', options.proxyPass);
   }
 
   this.state = 'stop';
