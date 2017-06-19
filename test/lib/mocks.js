@@ -60,8 +60,8 @@ var ServerResponse = function () {
 };
 
 var ServerRequest = {
-	get: function(url, callback) {
-		ServerRequest.url = url;
+	get: function(options, callback) {
+		ServerRequest.url = 'https://' + options.hostname + options.path;
 		callback(ServerResponse());
 	}
 };

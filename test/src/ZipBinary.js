@@ -65,7 +65,7 @@ describe('ZipBinary', function () {
 
     describe('#update', function () {
       it('should download the zip file', function (done) {
-        zipBinary.update(function () {
+        zipBinary.update({}, function () {
           expect(fsMock.fileNameModded).to.equal(DEFAULT_BINARY_FILE);
           expect(fsMock.mode).to.equal('0755');
           expect(unzipMock.dirName).to.equal(DEFAULT_BINARY_DIR);
@@ -77,7 +77,7 @@ describe('ZipBinary', function () {
       describe('with no arch', function () {
         it('should download the zip file', function (done) {
           zipBinary = new ZipBinary(PLATFORM);
-          zipBinary.update(function () {
+          zipBinary.update({}, function () {
             expect(fsMock.fileNameModded).to.equal(DEFAULT_BINARY_FILE_NO_ARCH);
             expect(fsMock.mode).to.equal('0755');
             expect(unzipMock.dirName).to.equal(DEFAULT_BINARY_DIR_NO_ARCH);
@@ -115,7 +115,7 @@ describe('ZipBinary', function () {
 
     describe('#update', function () {
       it('should download the zip file', function (done) {
-        zipBinary.update(function () {
+        zipBinary.update({}, function () {
           expect(fsMock.fileNameModded).to.equal(OTHER_BINARY_FILE);
           expect(fsMock.mode).to.equal('0755');
           expect(unzipMock.dirName).to.equal(OTHER_BINARY_DIR);
@@ -127,7 +127,7 @@ describe('ZipBinary', function () {
       describe('with no arch', function () {
         it('should download the zip file', function (done) {
           zipBinary = new ZipBinary(PLATFORM, null, OTHER_BINARY_DIR);
-          zipBinary.update(function () {
+          zipBinary.update({}, function () {
             expect(fsMock.fileNameModded).to.equal(OTHER_BINARY_FILE);
             expect(fsMock.mode).to.equal('0755');
             expect(unzipMock.dirName).to.equal(OTHER_BINARY_DIR);

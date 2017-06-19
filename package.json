@@ -45,6 +45,7 @@
     "child_process"
   ],
   "dependencies": {
+    "https-proxy-agent": "^1.0.0",
     "unzip": "~0.1.9"
   }
 }
