@@ -92,7 +92,7 @@ function BrowserStackTunnel(options) {
     console.log('BrowserStackTunnel: binary out of date');
     this.killTunnel();
     var self = this;
-    binary.update(function () {
+    binary.update(options, function () {
       self.startTunnel();
     });
   });
@@ -160,7 +160,7 @@ function BrowserStackTunnel(options) {
     if (!fs.existsSync(binary.path)) {
       console.log('BrowserStackTunnel: binary not present');
       var self = this;
-      binary.update(function () {
+      binary.update(options, function () {
         self._startTunnel();
       });
     } else {

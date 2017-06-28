@@ -1,7 +1,8 @@
 var path = require('path'),
     https = require('https'),
     unzip = require('unzip'),
-    fs = require('fs');
+    fs = require('fs'),
+    HttpsProxyAgent = require('https-proxy-agent');
 
 function ZipBinary(platform, arch, bin, ext) {
   'use strict';
@@ -12,11 +13,28 @@ function ZipBinary(platform, arch, bin, ext) {
   self.command = self.path;
   self.args = [];
 
-  self.update = function (callback) {
+  self.update = function (config, callback) {
     var extractStream = unzip.Extract({
       path: self.bin
     });
-    https.get('https://www.browserstack.com/browserstack-local/BrowserStackLocal-' + platform + (arch ? '-' + arch : '') + '.zip', function (response) {
+
+    var proxy = null;
+    if (config.proxyHost && config.proxyPort) {
+      config.proxyProtocol = config.proxyProtocol || 'http';
+      var proxyAuth = (config.proxyUser && config.proxyPass) ?
+          (encodeURIComponent(config.proxyUser) + ':' + encodeURIComponent(config.proxyPass) + '@') : '';
+      proxy = config.proxyProtocol + '://' + proxyAuth + config.proxyHost + ':' + config.proxyPort;
+    }
+
+    var options = {
+      hostname: 'www.browserstack.com',
+      port: 443,
+      path: '/browserstack-local/BrowserStackLocal-' + platform + (arch ? '-' + arch : '') + '.zip',
+      method: 'GET',
+      agent: (proxy) ? new HttpsProxyAgent(proxy) : null
+    };
+
+    https.get(options, function (response) {
       console.log('BrowserStackTunnel: download binary for ' + platform + (arch ? '-' + arch : '') + ' ...');
       extractStream.on('close', function () {
         console.log('BrowserStackTunnel: download complete');
