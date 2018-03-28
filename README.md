@@ -38,7 +38,8 @@ var browserStackTunnel = new BrowserStackTunnel({
   proxyHost: PROXY_HOST, // optionally set the -proxyHost option
   force: false, // optionally set the -force option
   forcelocal: false, // optionally set the -forcelocal option
-  onlyAutomate: false, // optionally set the -onlyAutomate option
+  onlyAutomate: false, // optionally set the -onlyAutomate option,
+  enableLoggingForApi: true // optionally set the -enable-logging-for-api option
 });
 
 browserStackTunnel.start(function(error) {

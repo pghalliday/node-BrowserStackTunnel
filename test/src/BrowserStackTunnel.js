@@ -536,6 +536,41 @@ describe('BrowserStackTunnel', function () {
     }, 100);
   });
 
+  it('should support the enableLoggingForApi option', function (done) {
+    spawnSpy.reset();
+    var browserStackTunnel = new bs.BrowserStackTunnel({
+      key: KEY,
+      hosts: [{
+        name: HOST_NAME,
+        port: PORT,
+        sslFlag: SSL_FLAG
+      }],
+      onlyAutomate: true,
+      win32Bin: WIN32_BINARY_DIR
+    });
+    browserStackTunnel.start(function (error) {
+      if (error) {
+        expect().fail(function () { return error; });
+      } else if (browserStackTunnel.state === 'started') {
+        sinon.assert.calledOnce(spawnSpy);
+        sinon.assert.calledWithExactly(
+          spawnSpy,
+          WIN32_BINARY_FILE, [
+            KEY,
+            '--only',
+            HOST_NAME + ',' + PORT + ',' + SSL_FLAG,
+            '--enable-logging-for-api'
+          ]
+        );
+        done();
+      }
+    });
+
+    setTimeout(function () {
+      process.emit('mock:child_process:stdout:data', 'monkey-----  Press Ctrl-C to exit ----monkey');
+    }, 100);
+  });
+
   describe('on windows', function () {
     beforeEach(function () {
       osMock._platform = 'win32';

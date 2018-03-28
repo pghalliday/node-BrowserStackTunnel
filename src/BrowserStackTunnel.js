@@ -79,6 +79,10 @@ function BrowserStackTunnel(options) {
     params.push('--proxy-pass', options.proxyPass);
   }
 
+  if (options.enableLoggingForApi) {
+    params.push('--enable-logging-for-api');
+  }
+
   this.state = 'stop';
   this.stateMatchers = {
     'already_running': new RegExp('\\*\\*Error: There is another JAR already running'),
