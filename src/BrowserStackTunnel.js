@@ -63,6 +63,10 @@ function BrowserStackTunnel(options) {
     params.push('--only-automate');
   }
 
+  if (options.enableLoggingForApi) {
+    params.push('--enable-logging-for-api');
+  }
+
   if (options.proxyHost) {
     params.push('--proxy-host', options.proxyHost);
   }
@@ -77,10 +81,6 @@ function BrowserStackTunnel(options) {
 
   if (options.proxyPass) {
     params.push('--proxy-pass', options.proxyPass);
-  }
-
-  if (options.enableLoggingForApi) {
-    params.push('--enable-logging-for-api');
   }
 
   this.state = 'stop';
