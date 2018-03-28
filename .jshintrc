@@ -21,7 +21,7 @@
 	"maxparams": 10,
 	"maxdepth": 3,
 	"maxstatements": 50,
-	"maxcomplexity": 15,
+	"maxcomplexity": 16,
 	"debug": true,
 	"smarttabs": true,
 	"browser": true,
