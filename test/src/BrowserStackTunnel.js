@@ -219,7 +219,7 @@ describe('BrowserStackTunnel', function () {
   });
 
   it('should support multiple hosts', function (done) {
-    spawnSpy.reset();
+    spawnSpy.resetHistory();
     var browserStackTunnel = new bs.BrowserStackTunnel({
       key: KEY,
       hosts: [{
@@ -256,7 +256,7 @@ describe('BrowserStackTunnel', function () {
   });
 
   it('should support no hosts', function (done) {
-    spawnSpy.reset();
+    spawnSpy.resetHistory();
     var browserStackTunnel = new bs.BrowserStackTunnel({
       key: KEY,
       win32Bin: WIN32_BINARY_DIR
@@ -282,7 +282,7 @@ describe('BrowserStackTunnel', function () {
   });
 
   it('should use the specified binary directory', function (done) {
-    spawnSpy.reset();
+    spawnSpy.resetHistory();
     var browserStackTunnel = new bs.BrowserStackTunnel({
       key: KEY,
       hosts: [{
@@ -316,7 +316,7 @@ describe('BrowserStackTunnel', function () {
   });
 
   it('should support the localIdentifier option', function (done) {
-    spawnSpy.reset();
+    spawnSpy.resetHistory();
     var browserStackTunnel = new bs.BrowserStackTunnel({
       key: KEY,
       hosts: [{
@@ -352,7 +352,7 @@ describe('BrowserStackTunnel', function () {
   });
 
   it('should support the v (verbose) option', function (done) {
-    spawnSpy.reset();
+    spawnSpy.resetHistory();
     var browserStackTunnel = new bs.BrowserStackTunnel({
       key: KEY,
       hosts: [{
@@ -387,7 +387,7 @@ describe('BrowserStackTunnel', function () {
   });
 
   it('should support the force option', function (done) {
-    spawnSpy.reset();
+    spawnSpy.resetHistory();
     var browserStackTunnel = new bs.BrowserStackTunnel({
       key: KEY,
       hosts: [{
@@ -422,7 +422,7 @@ describe('BrowserStackTunnel', function () {
   });
 
   it('should support the forcelocal option', function (done) {
-    spawnSpy.reset();
+    spawnSpy.resetHistory();
     var browserStackTunnel = new bs.BrowserStackTunnel({
       key: KEY,
       hosts: [{
@@ -457,7 +457,7 @@ describe('BrowserStackTunnel', function () {
   });
 
   it('should support the onlyAutomate option', function (done) {
-    spawnSpy.reset();
+    spawnSpy.resetHistory();
     var browserStackTunnel = new bs.BrowserStackTunnel({
       key: KEY,
       hosts: [{
@@ -492,7 +492,7 @@ describe('BrowserStackTunnel', function () {
   });
 
   it('should support the enableLoggingForApi option', function (done) {
-    spawnSpy.reset();
+    spawnSpy.resetHistory();
     var browserStackTunnel = new bs.BrowserStackTunnel({
       key: KEY,
       hosts: [{
@@ -527,7 +527,7 @@ describe('BrowserStackTunnel', function () {
   });
 
   it('should support the proxy options', function (done) {
-    spawnSpy.reset();
+    spawnSpy.resetHistory();
     var browserStackTunnel = new bs.BrowserStackTunnel({
       key: KEY,
       hosts: [{
@@ -633,7 +633,7 @@ describe('BrowserStackTunnel', function () {
     });
 
     it('should use the specified binary directory', function (done) {
-      spawnSpy.reset();
+      spawnSpy.resetHistory();
       var browserStackTunnel = new bs.BrowserStackTunnel({
         key: KEY,
         hosts: [{
@@ -729,7 +729,7 @@ describe('BrowserStackTunnel', function () {
     });
 
     it('should use the specified bin directory', function (done) {
-      spawnSpy.reset();
+      spawnSpy.resetHistory();
       var browserStackTunnel = new bs.BrowserStackTunnel({
         key: KEY,
         hosts: [{
@@ -825,7 +825,7 @@ describe('BrowserStackTunnel', function () {
     });
 
     it('should use the specified bin directory', function (done) {
-      spawnSpy.reset();
+      spawnSpy.resetHistory();
       var browserStackTunnel = new bs.BrowserStackTunnel({
         key: KEY,
         hosts: [{
@@ -921,7 +921,7 @@ describe('BrowserStackTunnel', function () {
     });
 
     it('should use the specified bin directory', function (done) {
-      spawnSpy.reset();
+      spawnSpy.resetHistory();
       var browserStackTunnel = new bs.BrowserStackTunnel({
         key: KEY,
         hosts: [{

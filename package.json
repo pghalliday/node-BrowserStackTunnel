@@ -29,14 +29,15 @@
     "test": "grunt"
   },
   "devDependencies": {
-    "grunt": "~0.4.1",
-    "expect.js": "~0.2.0",
-    "grunt-mocha-test": "~0.6.3",
-    "grunt-contrib-jshint": "~0.6.2",
-    "grunt-contrib-watch": "~0.5.1",
+    "expect.js": "~0.3.1",
+    "grunt": "~1.0.2",
+    "grunt-cli": "~1.2.0",
+    "grunt-contrib-jshint": "~1.1.0",
+    "grunt-contrib-watch": "~1.1.0",
+    "grunt-mocha-test": "~0.13.3",
+    "mocha": "^5.2.0",
     "mocks": "0.0.15",
-    "grunt-cli": "~0.1.9",
-    "sinon": "~1.7.3"
+    "sinon": "~5.0.7"
   },
   "keywords": [
     "BrowserStack",
@@ -45,7 +46,7 @@
     "child_process"
   ],
   "dependencies": {
-    "https-proxy-agent": "^1.0.0",
-    "unzip": "~0.1.9"
+    "https-proxy-agent": "^2.2.1",
+    "unzip": "~0.1.11"
   }
 }
