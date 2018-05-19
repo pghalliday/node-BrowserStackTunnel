@@ -5,3 +5,4 @@ BrowserStackConfig.js
 Berksfile.lock
 Vagrantfile
 /bin/
+.idea
