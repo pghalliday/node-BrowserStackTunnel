@@ -13,7 +13,7 @@ childProcessMock.spawn = spawnSpy;
 var zb = mocks.loadFile('./src/ZipBinary.js', {
   https: httpMock,
   fs: fsMock,
-  unzip: unzipMock
+  unzipper: unzipMock
 });
 var ZipBinary = zb.ZipBinary;
 
