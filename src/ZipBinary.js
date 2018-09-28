@@ -1,6 +1,6 @@
 var path = require('path'),
     https = require('https'),
-    unzip = require('unzip'),
+    unzip = require('unzipper'),
     fs = require('fs'),
     HttpsProxyAgent = require('https-proxy-agent');
 
